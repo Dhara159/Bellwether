@@ -135,7 +135,7 @@ def historic_data_search():
 	print(sdate)
 	print(edate)
 	fName = str(trade + '.csv')
-	df = quandl.get(trade, authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=sdate,end_date=edate)
+	df = quandl.get("NSE/"+trade.upper(), authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=sdate,end_date=edate)
 	datalist = df.values.tolist()
 	# print(df.index)
 	# print(datalist)
@@ -219,7 +219,7 @@ def getLiveData():
 	# threading.Timer(60.0,getLiveData).start()
 	url = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=biocon&interval=1min&apikey=KPEFHIZF3S02LQF1')
 	jsonData = json.loads(url.text)
-	finalTime = "2018-03-09 05:00:00"
+	finalTime = getUsTime()
 	openValue = jsonData['Time Series (1min)'][finalTime]['1. open']
 	highValue = jsonData["Time Series (1min)"][finalTime]['2. high']
 	lowValue = jsonData["Time Series (1min)"][finalTime]['3. low']
