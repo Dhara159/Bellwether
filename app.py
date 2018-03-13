@@ -250,11 +250,11 @@ def getLiveData():
 		url = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=%s&interval=15min&apikey=KPEFHIZF3S02LQF1'%(trades[i]))
 		jsonData = json.loads(url.text)
 		finalTime = getUsTime()
-		openValue = jsonData['Time Series (1min)'][finalTime]['1. open']
-		highValue = jsonData["Time Series (1min)"][finalTime]['2. high']
-		lowValue = jsonData["Time Series (1min)"][finalTime]['3. low']
-		closeValue = jsonData["Time Series (1min)"][finalTime]['4. close']
-		volumeValue = jsonData["Time Series (1min)"][finalTime]['5. volume']
+		openValue = jsonData['Time Series (15min)'][finalTime]['1. open']
+		highValue = jsonData["Time Series (15min)"][finalTime]['2. high']
+		lowValue = jsonData["Time Series (15min)"][finalTime]['3. low']
+		closeValue = jsonData["Time Series (15min)"][finalTime]['4. close']
+		volumeValue = jsonData["Time Series (15min)"][finalTime]['5. volume']
 		insertLiveData(openValue, highValue, lowValue, closeValue, volumeValue, finalTime)
 	return(NULL)
 
