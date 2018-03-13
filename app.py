@@ -28,10 +28,10 @@ app.secret_key = 'super secret key'
 mysql = MySQL()
  
 # MySQL configurations
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = ''
-app.config['MYSQL_DATABASE_DB'] = 'bi1'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['MYSQL_DATABASE_USER'] = 'sql12226313'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'tmctEEKWMm'
+app.config['MYSQL_DATABASE_DB'] = 'sql12226313'
+app.config['MYSQL_DATABASE_HOST'] = 'sql12.freemysqlhosting.net'
 mysql.init_app(app)
 
 @app.route('/')
