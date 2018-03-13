@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>BI | Buy/Sell</title>
+    <title>BI | Profile </title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.5 -->
     <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="../static/custom-top-header.css">
-    
+
   </head>
   <body class="hold-transition skin-blue sidebar-mini">
     <div class="navbar navbar-fixed-top navbar-default" role="navigation">
@@ -59,48 +59,46 @@
 
             <div class="col-xs-8 col-sm-8" style="margin-top: 15px;">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h2>Buy and Sell your Shares here</h2>
+                    <div class="modal-header" id="header_style" style="background-color: #208dbf;">
+                        <h2 style="text-align: center;"><img class="img-circle" src="../static/images/profile.jpg" alt="User Avatar"><br>Jay Desai</h2>
                     </div>
                     <br>
-                    <div class="modal-body">
-                    <form action="buy_sell_confirm">
-                      <div class="form-group">
-                        <label for="trade" class="bmd-label-floating">Select any one option:</label>
-                        <div class="radio-inline">
-                          <label><input type="radio" name="buy" value="buy">Buy</label>
-                        </div>
-                        <div class="radio-inline">
-                          <label><input type="radio" name="buy" value="sell">Sell</label>
-                        </div>
-                        <br>
-                        <br>
-                        <label for="trade" class="bmd-label-floating">Trade Name:</label>
-                        <input type="text" class="form-control" name="trade">
-                        <span class="bmd-help">Please enter name of trade. It must be stock market compatiable and no lesser than two letters</span><br>
-                        <span class="bmd-help">And this would probably give all possible data for that particular trade. Data might be delayed by 15 minutes.</span>
-                        <br>
+                    <div class="modal-body" id="body_style">
                         
-                        <label for="cprice" class="bmd-label-floating">Current price per share:</label>
-                        <input type="text" class="form-control" name="cprice">
+                        <hr>
+                        <h2>Account Details</h2>  
+                        <hr>
                         <br>
-                        
-                        <label for="volume" class="bmd-label-floating">Number of shares:</label>
-                        <input type="text" class="form-control" name="volume">
+                        <h4>Virtual Money:</h4>
                         <br>
-                        
-                        <label for="total" class="bmd-label-floating">Total Price:</label>
-                        <input type="text" class="form-control" name="total">
-                      </div>
-                      <button type="submit" name="submit" class="next action-button" value="Submit" >Submit</button>
-                    </form>    
+                        <h4>Total Volume:</h4>
+                        <br>
+                        <h4>Money Spend:</h4>
+                        <br>
+                        <h4>Total Profit/Loss:</h4>
+                        <br>
+                        <hr>
+                        <h2>Personal Details</h2>
+                        <hr>
+                        <br>
+                        <h4>User Id:</h4>
+                        <br>
+                        <h4>User Name:</h4>
+                        <br>
+                        <h4>User E-mail:</h4>
+                        <br>
+                        <h4>User Mobile Number:</h4>
+                        <br>
+
                     </div>
-                    
-                    <div class="modal-footer">
-                        <h4>Once you click button, you will be asked for confirmation on your purchase/sell according to availability of virtual money.</h4>
-                        
+                    <div class="modal-footer" id="footer_style">
+                        <h2 style="text-align: left; padding-bottom: -15px;">Click here to edit your profile:</h2>
+                        <button class="btn btn-success" style="padding-left: -30px; padding-right: -30px;" href="profile_edit.html">Edit</button>
                     </div>
                 </div>
+
+                
+            </div>
             </div>
             <!--/span-->
         </div>

@@ -4,6 +4,7 @@ from werkzeug import generate_password_hash, check_password_hash
 from flask import jsonify
 from pytz import timezone
 import datetime, requests
+from datetime import timedelta
 import json
 import threading
 import os, csv, quandl
@@ -150,6 +151,13 @@ def historic_data_search():
 	# print(df1)
 	return render_template("historic_data_search.html",datalist=datalist, df=df.to_html(classes=["table", "thead-dark","table-bordered", "table-striped", "table-hover"]))
 
+
+
+@app.route('/algorithms')
+def algorithms():
+	return render_template("algorithms.html")
+
+
 @app.route('/historic_graph')
 def historic_graph():
 	return render_template("historic_graph.html")
@@ -167,28 +175,48 @@ def historic_graph_search():
 	print(sdate)
 	print(edate)
 	fName = str(trade + '.csv')
-	df = quandl.get(trade, authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=sdate,end_date=edate)
+	df = quandl.get("NSE/"+trade.upper(), authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=sdate,end_date=edate)
 	fig = df[[attribute]].plot()
-	data = plt.savefig('mytable.png')
-	return render_template("historic_graph_search.html", data=data)
-
+	file_path = "static/images/mytable1.png"
+	data = plt.savefig(file_path)
+	return render_template("historic_graph_search.html")
 
 @app.route('/buy_sell')
 def buy_sell():
 	return render_template("buy_sell.html")
 
+@app.route('/buy_sell_confirm')
+def buy_sell_confirm():
+	order_type=request.args['buy']
+	trade = request.args['trade']
+	volume = request.args['volume']
+	cprice = request.args['cprice']
+	total = request.args['total']
 
-@app.route('/algorithms')
-def algorithms():
-	return render_template("algorithms.html")
+	print(order_type)
+	print(trade)
+	print(volume)
+	print(cprice)
+	print(total)
+	if(order_type == "buy"):
+		sellingPrice =0
+		purchasePrice = total
 
-@app.route('/buy')
-def buy():
-	return render_template("buy.html")
+	else:
+		purchasePrice =0
+		sellingPrice = total
 
-@app.route('/sell')
-def sell():
-	return render_template("sell.html")
+	conn = mysql.connect()
+	cursor = conn.cursor()
+	cursor.execute("INSERT INTO ORDERDETAILS (id,userId,tradeName,dates,purchasePrice,sellingPrice,volume) VALUES (%s,%s,%s,%s,%s,%s,%s)", ('9','2',trade,'2018-03-14',float(purchasePrice),float(sellingPrice),float(volume)))
+	conn.commit()
+	return render_template("buy_sell_confirm.html", trade=trade,volume=volume,total=total,cprice=cprice,purchasePrice=purchasePrice,sellingPrice=sellingPrice)
+
+
+@app.route('/profile')
+def profile():
+	return render_template("profile.html")
+
 
 @app.route("/order_details")
 def order_details():
@@ -215,33 +243,21 @@ def print_items():
     return render_template('print_items.html', items=Units.query.all())
 
 @app.route("/getLiveData")
-def getLiveData():
-	# threading.Timer(60.0,getLiveData).start()
-	url = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=biocon&interval=1min&apikey=KPEFHIZF3S02LQF1')
-	jsonData = json.loads(url.text)
-	finalTime = getUsTime()
-	openValue = jsonData['Time Series (1min)'][finalTime]['1. open']
-	highValue = jsonData["Time Series (1min)"][finalTime]['2. high']
-	lowValue = jsonData["Time Series (1min)"][finalTime]['3. low']
-	closeValue = jsonData["Time Series (1min)"][finalTime]['4. close']
-	volumeValue = jsonData["Time Series (1min)"][finalTime]['5. volume']
-	return insertLiveData(openValue, highValue, lowValue, closeValue, volumeValue, finalTime)
+def getLiveData():	
+	trades = ["HDFC","BIOCON","PNB","AJANTAPHARM","AKZOINDIA","ASHOKLEY","ASIANPAINT","ASTRAZEN","AUROPHARMA","AXISBANK","BAJAJCORP","BPCL","CENTRALBK","DENABANK","DISHTV","DLF","GAIL","GLENMARK","GODREJCP","GODREJIND","GPPL","HAVELLS","HDFCBANK","HEROMOTOCO","ICICIBANK","IDBI","NAUKRI","JETAIRWAYS","JUSTDIAL","ONGC"]
+	inLoop = threading.Timer(900.0,getLiveData).start()
+	for i in range(len(trades)):
+		url = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=%s&interval=15min&apikey=KPEFHIZF3S02LQF1'%(trades[i]))
+		jsonData = json.loads(url.text)
+		finalTime = getUsTime()
+		openValue = jsonData['Time Series (1min)'][finalTime]['1. open']
+		highValue = jsonData["Time Series (1min)"][finalTime]['2. high']
+		lowValue = jsonData["Time Series (1min)"][finalTime]['3. low']
+		closeValue = jsonData["Time Series (1min)"][finalTime]['4. close']
+		volumeValue = jsonData["Time Series (1min)"][finalTime]['5. volume']
+		insertLiveData(openValue, highValue, lowValue, closeValue, volumeValue, finalTime)
+	return(NULL)
 
-def insertLiveData(openValue, highValue, lowValue, closeValue, volumeValue, finalTime):
-	conn = mysql.connect()
-	cursor = conn.cursor()
-	try:
-		cursor.execute("INSERT INTO liveData (stockName, open, close, high, low, volume, dateAndTime) VALUES (%s, %s, %s, %s, %s, %s, %s)", ('biocon',  float(openValue), float(closeValue), float(highValue), float(lowValue), float(volumeValue), finalTime))
-		conn.commit()
-		return("Data inserted successfully")
-	except MySQLdb.IntegrityError:
-		return("Failed to insert values")
-
-def getUsTime():
-	usa = timezone("US/Eastern")
-	usTime = datetime.datetime.now(usa)
-	saveUs = usTime.strftime("%Y-%m-%d %H:%M:00")
-	return saveUs
 @app.route("/knn")
 def knn():
     k = 3
@@ -309,6 +325,27 @@ def svrpoly():
             prices.append(float(row[4]))
     predictedPrice=predictPricesSvrpoly(dates,prices, 167)
     return("SVRPolynomial predicted price: %f" % (predictedPrice))
+
+def insertLiveData(openValue, highValue, lowValue, closeValue, volumeValue, finalTime):
+	conn = mysql.connect()
+	cursor = conn.cursor()
+	try:
+		cursor.execute("INSERT INTO liveData (stockName, open, close, high, low, volume, dateAndTime) VALUES (%s, %s, %s, %s, %s, %s, %s)", ('biocon',  float(openValue), float(closeValue), float(highValue), float(lowValue), float(volumeValue), finalTime))
+		conn.commit()
+		return("Data inserted successfully")
+	except MySQLdb.IntegrityError:
+		return("Failed to insert values")
+
+def getIndTime():
+	indTime = datetime.datetime.now()
+	saveInd = indTime.strftime("%Y-%m-%d %H:%M:00")
+	return saveInd
+
+def getUsTime():
+	usa = timezone("US/Eastern")
+	usTime = datetime.datetime.now(usa)
+	saveUs = usTime.strftime("%Y-%m-%d %H:%M:00")
+	return saveUs
 
 def predictPricesSvrpoly(dates,prices,x):
     dates = np.reshape(dates,(len(dates),1))
