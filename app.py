@@ -77,7 +77,7 @@ def signin():
 
 # @app.after_request
 # def add_header(response):
-#     response.cache_control.max_age = 300
+#     response.headers.add('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')   
 #     return response
 
 @app.route('/client_dashboard')
