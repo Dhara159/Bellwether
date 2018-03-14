@@ -213,30 +213,51 @@ def buy_sell():
 		return("You are logged out!")
 
 
-@app.route('/buy_sell_confirm')
+@app.route('/buy_sell_confirm', methods=['GET','POST'])
 def buy_sell_confirm():
-	order_type=request.args['buy']
-	trade = request.args['trade']
-	volume = request.args['volume']
-	cprice = request.args['cprice']
-	total = request.args['total']
-	print(order_type)
-	print(trade)
-	print(volume)
-	print(cprice)
-	print(total)
-	if(order_type == "buy"):
-		sellingPrice =0
-		purchasePrice = total
-	else:
-		purchasePrice =0
-		sellingPrice = total
-	conn = mysql.connect()
-	cursor = conn.cursor()
-	cursor.execute("INSERT INTO ORDERDETAILS (id,userId,tradeName,dates,purchasePrice,sellingPrice,volume) VALUES (%s,%s,%s,%s,%s,%s,%s)", ('9','2',trade,'2018-03-14',float(purchasePrice),float(sellingPrice),float(volume)))
-	conn.commit()
-	return render_template("buy_sell_confirm.html", trade=trade,volume=volume,total=total,cprice=cprice,purchasePrice=purchasePrice,sellingPrice=sellingPrice)
+	if "userEmail" in session:
+		order_type=request.form['buy']
+		trade = request.form['trade']
+		volume = int(request.form['volume'])
+		cprice = request.form['cprice']
+		total = request.form['total']
+		print(order_type)
+		print(trade)
+		print(volume)
+		print(cprice)
+		print(total)
+		print(type(total))
+		conn1 = mysql.connect()
+		cursor1 = conn1.cursor()
+		userEmail = str(session['userEmail'])
+		cursor1.execute("SELECT virtualMoney,userId from users WHERE userEmail ='" + userEmail + "' ")
+		virtualMoney = cursor1.fetchone()
+		userId = int(virtualMoney[1])
+		print(virtualMoney)
+		print(userId)
+		conn1.commit()
+		if(order_type == "buy"):
+			sellingPrice =0
+			purchasePrice = total
+			virtualMoney = int(virtualMoney[0]) - int(total)
+			cursor1.execute("UPDATE users SET virtualMoney='" + str(virtualMoney) + "', userId= '"+ str(userId) +"' WHERE userEmail='"+ str(userEmail) +"' ")
+			conn1.commit()
+		else:
+			purchasePrice =0
+			sellingPrice = total
+			virtualMoney = int(virtualMoney[0]) + int(total)
+			cursor1.execute("UPDATE users SET virtualMoney='" + str(virtualMoney) + "', userId= '"+ str(userId) +"' WHERE userEmail='"+ str(userEmail) +"' ")
+			conn1.commit()
 
+		usTime = datetime.datetime.now()
+		currenttime = usTime.strftime("%Y-%m-%d")
+		conn = mysql.connect()
+		cursor = conn.cursor()
+		cursor.execute("INSERT INTO orderdetails (userId,tradeName,dates,purchasePrice,sellingPrice,volume) VALUES (%s,%s,%s,%s,%s,%s)", (str(userId),trade,str(currenttime),float(purchasePrice),float(sellingPrice),float(volume)))
+		conn.commit()
+		return render_template("buy_sell_confirm.html", trade=trade,volume=volume,total=total,cprice=cprice,purchasePrice=purchasePrice,sellingPrice=sellingPrice)
+	else:
+		return("You are logged out!")
 
 @app.route('/profile')
 def profile():
