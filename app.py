@@ -34,6 +34,12 @@ app.config['MYSQL_DATABASE_DB'] = 'sql12226313'
 app.config['MYSQL_DATABASE_HOST'] = 'sql12.freemysqlhosting.net'
 mysql.init_app(app)
 
+@app.after_request
+def after_request(response):
+    response.headers.add('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')   
+    return response
+
+
 @app.route('/')
 def hello():
 	return 'hello'
@@ -74,11 +80,6 @@ def insertNewUser(userName, userEmail, userPassword):
 @app.route('/signin')
 def signin():
 	return render_template("client_login.html")
-
-# @app.after_request
-# def add_header(response):
-#     response.headers.add('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')   
-#     return response
 
 @app.route('/client_dashboard')
 def client_dashboard():
