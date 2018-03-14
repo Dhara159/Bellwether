@@ -343,14 +343,47 @@ def knn():
     k = 3
     startDate = (datetime.datetime.now()).strftime("%Y-%m-%d")
     endDate = ((datetime.date.today()-relativedelta(months=+3))).strftime("%Y-%m-%d")
-    df = quandl.get("NSE/DLF", authtoken="JMRWwixg-zh5jGHGnKzn",start_date=endDate,end_date=startDate)
+    tradeName = "NSE/TCS"
+    df = quandl.get("NSE/TCS", authtoken="JMRWwixg-zh5jGHGnKzn",start_date=endDate,end_date=startDate)
     df1 = df[['Open','Close']]
     print(df1)
     dataList = df1.values.tolist()
     testInstance = dataList[len(dataList)-2]
     neighbors = getNeighbors(testInstance, dataList, k)
     idwPrediction, meanPrediction  = prediction(neighbors)
-    return("Inverse Distance Weighted Average Prediction: %f <br/> Mean Average Prediction: %f" % (idwPrediction, meanPrediction))
+    # return("Inverse Distance Weighted Average Prediction: %f <br/> Mean Average Prediction: %f" % (idwPrediction, meanPrediction))
+    return(bb(tradeName,endDate, idwPrediction,meanPrediction))
+
+@app.route("/bb")
+def bb(tradeName,endDate, idwPrediction, meanPrediction):
+	df = quandl.get(tradeName, authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=endDate)
+	window=20
+	no_of_std=2
+	rolling_mean = df['Close'].rolling(window).mean()
+	rolling_std = df['Close'].rolling(window).std()
+	df['Bollinger High'] = rolling_mean + (rolling_std * no_of_std)
+	df['Bollinger Low'] = rolling_mean - (rolling_std * no_of_std)
+	df['Short'] = None
+	df['Long'] = None
+	df['Position'] = None
+	for row in range(len(df)):
+		if (df['Close'].iloc[row] > df['Bollinger High'].iloc[row]) and (df['Close'].iloc[row-1] < df['Bollinger High'].iloc[row-1]):
+			df['Position'].iloc[row] = -1
+		if (df['Close'].iloc[row] < df['Bollinger Low'].iloc[row]) and (df['Close'].iloc[row-1] > df['Bollinger Low'].iloc[row-1]):
+			df['Position'].iloc[row] = 1
+	df['Position'].fillna(method='ffill',inplace=True)
+	df['Market Return'] = np.log(df['Close'] / df['Close'].shift(1))
+	df['Strategy Return'] = df['Market Return'] * df['Position']
+	df = df[np.isfinite(df['Strategy Return'])]
+	print(max(df['Strategy Return']))
+	df1 = df.loc[df['Strategy Return'] == max(df['Strategy Return'])]
+	print ("minimum point for purchasing stocks %s" %df1['Close'].to_string(index=False))
+	print(min(df['Strategy Return']))
+	df2 = df.loc[df['Strategy Return'] == min(df['Strategy Return'])]
+	print ("maximum point for selling stocks %s" %df2['Close'].to_string(index=False))
+	df['Strategy Return'].cumsum().plot()
+	df[['Close','Bollinger High','Bollinger Low']].plot()
+	return("idwPrediction: %s" %(idwPrediction) + "</br>" + "meanPrediction: %s" %(meanPrediction) + "</br>" + "minimum point for purchasing stocks: %s" %((df1['Close'].values))[0] + "</br>" + "maximum point for selling stocks: %s" %(df2['Close'].values)[0])
 
 @app.route("/mlp")
 def mlp():
