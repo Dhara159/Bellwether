@@ -79,12 +79,15 @@ def insertNewUser(userName, userEmail, userPassword):
 
 @app.route('/signin')
 def signin():
-	return render_template("client_login.html")
+	if "userEmail" in session:
+		return(redirect(url_for("client_page")))
+	else :
+		return render_template("client_login.html")
 
-@app.route('/client_dashboard')
+@app.route('/client_dashboard', methods = ["POST", "GET"])
 def client_dashboard():
-	userEmail = request.args['userEmail']
-	userPassword = request.args['userPassword']
+	userEmail = request.form['userEmail']
+	userPassword = request.form['userPassword']
 	print(userEmail)
 	print(userPassword)
 	conn = mysql.connect()
@@ -97,12 +100,12 @@ def client_dashboard():
 
 	if userEmail == data[0] and userPassword == data[1]:
 		conn.commit()
-		# session['userEmail'] = request.args['userEmail']
-		# session['loged_in'] = True
+		session['userEmail'] = userEmail
+		session['loged_in'] = True
 		# print(session)
 		#redirect(url_for('client_dashboard.html'))
 		#return gotoclient()
-		return render_template("client_dashboard.html")
+		return(redirect(url_for("client_page")))
 
 	#return render_template("client_dashboard.html")
 
@@ -112,11 +115,24 @@ def client_dashboard():
 #	else:
 #		return render_template("client_dashboard.html")
 
+@app.route('/client_page')
+def client_page():
+	if "userEmail" in session:
+		return render_template("client_dashboard.html")
+	else:
+		return("You are logged out!")
+	
+
 @app.route('/client_logout')
 def client_logout():
-	return render_template('client_login.html')
-	#session.pop('userEmail', None)
-	#session.pop('loged_in',False)
+	session.pop('userEmail', None)
+	session.pop('loged_in',False)
+	return(redirect(url_for("logout_page")))
+
+@app.route('/logout_page')
+def logout_page():
+	return render_template("client_logout.html")
+	
 	# app.secret_key = os.urandom(32)
 	#for key in session.keys():
 	#	session.pop(key)
