@@ -51,9 +51,9 @@ def signup():
 
 @app.route('/registered',methods = ['POST', 'GET'])
 def registered():
-	userName = request.args['userName']
-	userEmail = request.args['userEmail']
-	userPassword = request.args['userPassword']
+	userName = request.form['userName']
+	userEmail = request.form['userEmail']
+	userPassword = request.form['userPassword']
 	#virtualMoney = 1000000
 	
 	print(userName)
@@ -140,15 +140,19 @@ def logout_page():
 	#print(session)
 	#return signin()
 
-@app.route("/historic_data")
+@app.route('/historic_data')
 def historic_data():
-	return render_template("historic_data.html")
+	if "userEmail" in session:
+		return render_template("historic_data.html")
+	else:
+		return("You are logged out!")
+	
 
 @app.route('/historic_data_search')
 def historic_data_search():
-	trade = request.args['trade']
-	sdate = request.args['sdate']	
-	edate = request.args['edate']
+	trade = request.form['trade']
+	sdate = request.form['sdate']	
+	edate = request.form['edate']
 	print(trade)
 	print(sdate)
 	print(edate)
@@ -174,11 +178,13 @@ def historic_data_search():
 def algorithms():
 	return render_template("algorithms.html")
 
-
 @app.route('/historic_graph')
 def historic_graph():
-	return render_template("historic_graph.html")
-
+	if "userEmail" in session:
+		return render_template("historic_graph.html")
+	else:
+		return("You are logged out!")
+	
 
 
 @app.route('/historic_graph_search')
@@ -198,9 +204,14 @@ def historic_graph_search():
 	data = plt.savefig(file_path)
 	return render_template("historic_graph_search.html",fig=fig)
 
+
 @app.route('/buy_sell')
 def buy_sell():
-	return render_template("buy_sell.html")
+	if "userEmail" in session:
+		return render_template("buy_sell.html")
+	else:
+		return("You are logged out!")
+
 
 @app.route('/buy_sell_confirm')
 def buy_sell_confirm():
@@ -209,7 +220,6 @@ def buy_sell_confirm():
 	volume = request.args['volume']
 	cprice = request.args['cprice']
 	total = request.args['total']
-
 	print(order_type)
 	print(trade)
 	print(volume)
@@ -218,11 +228,9 @@ def buy_sell_confirm():
 	if(order_type == "buy"):
 		sellingPrice =0
 		purchasePrice = total
-
 	else:
 		purchasePrice =0
 		sellingPrice = total
-
 	conn = mysql.connect()
 	cursor = conn.cursor()
 	cursor.execute("INSERT INTO ORDERDETAILS (id,userId,tradeName,dates,purchasePrice,sellingPrice,volume) VALUES (%s,%s,%s,%s,%s,%s,%s)", ('9','2',trade,'2018-03-14',float(purchasePrice),float(sellingPrice),float(volume)))
@@ -232,26 +240,38 @@ def buy_sell_confirm():
 
 @app.route('/profile')
 def profile():
-	return render_template("profile.html")
-
+	if "userEmail" in session:
+		return render_template("profile.html")
+	else:
+		return("You are logged out!")
+	
 
 @app.route("/order_details")
 def order_details():
-	conn = mysql.connect()
-	cursor = conn.cursor()
+	if "userEmail" in session:
+		conn = mysql.connect()
+		cursor = conn.cursor()
+		cursor.execute('SELECT id,userId,tradeName,dates,purchasePrice,sellingPrice,volume FROM orderdetails')
+		conn.commit()
+		return redirect(url_for("order_details_return"))
+	else:
+		return("You are logged out!")
 
-	cursor.execute('SELECT id,userId,tradeName,dates,purchasePrice,sellingPrice,volume FROM orderdetails')
-	conn.commit()
+@app.route("/order_details_return")
+def order_details_return():
 	return render_template("order_details.html", items=cursor.fetchall())
 
 @app.route("/order_details_search",methods=['POST','GET'])	
 def order_details_search():
-	conn = mysql.connect()
-	cursor = conn.cursor()
-	trade = request.form['trade']
-	cursor.execute("SELECT id,userId,tradeName,dates,purchasePrice,sellingPrice,volume FROM orderdetails WHERE tradeName ='" + trade + "' ")
-	conn.commit()
-	return render_template("order_details.html", items=cursor.fetchall())
+	if "userEmail" in session:
+		conn = mysql.connect()
+		cursor = conn.cursor()
+		trade = request.form['trade']
+		cursor.execute("SELECT id,userId,tradeName,dates,purchasePrice,sellingPrice,volume FROM orderdetails WHERE tradeName ='" + trade + "' ")
+		conn.commit()
+		return render_template("order_details.html", items=cursor.fetchall())
+	else:
+		return("You are logged out!")
 	
 
 @app.route('/print_items')
