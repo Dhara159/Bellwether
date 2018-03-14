@@ -262,10 +262,22 @@ def buy_sell_confirm():
 @app.route('/profile')
 def profile():
 	if "userEmail" in session:
-		return render_template("profile.html")
+		userEmail=str(session['userEmail'])
+		conn =mysql.connect()
+		cursor = conn.cursor()
+		cursor.execute("SELECT userId,userName,userEmail,virtualMoney FROM users WHERE userEmail = '"+ userEmail +"' ")
+		data = cursor.fetchone()
+		conn.commit()
+		return render_template("profile.html",data=data)
 	else:
 		return("You are logged out!")
 	
+@app.route('/profile_edit')
+def profile_edit():
+	if "userEmail" in session:
+		return render_template("profile_edit.html")
+	else:
+		return("You are logged out!")
 
 @app.route("/order_details")
 def order_details():

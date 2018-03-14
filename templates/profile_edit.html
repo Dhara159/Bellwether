@@ -66,19 +66,14 @@
                 <div class="modal-body">
                 <form action="historic_graph_search" method="POST">
                   <div class="form-group">
-                    <label for="trade" class="bmd-label-floating">Trade Name:</label>
-                    <input type="text" class="form-control" name="trade">
-                    <span class="bmd-help">Please enter name of trade. It must be stock market compatiable and no lesser than two letters</span><br>
-                    <span class="bmd-help">And this would probably give all possible data for that particular trade. Data might be delayed by 15 minutes.</span>
+                    <label for="userName" class="bmd-label-floating">User Name:</label>
+                    <input type="text" class="form-control" name="userName">
                     <br>
-                    <label for="attribute" class="bmd-label-floating">Attribute:</label>
-                    <input type="text" class="form-control" name="attribute">
+                    <label for="userEmail" class="bmd-label-floating">User Email:</label>
+                    <input type="email" class="form-control" name="userEmail">
                     <br>                    
-                    <label for="sdate" class="bmd-label-floating">Start Date:</label>
-                    <input type="date" class="form-control" name="sdate">
-                    <br>
-                    <label for="edate" class="bmd-label-floating">End Date:</label>
-                    <input type="date" class="form-control" name="edate">
+                    <label for="userPassword" class="bmd-label-floating">User Password:</label>
+                    <input type="text" class="form-control" name="userPassword">
                   </div>
                   <button type="submit" name="submit" class="next action-button" value="Search" >Search</button>
                 </form>    

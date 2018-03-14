@@ -69,7 +69,7 @@
                         <h2>Account Details</h2>  
                         <hr>
                         <br>
-                        <h4>Virtual Money:</h4>
+                        <h4>Virtual Money: {{ data[3] }}</h4>
                         <br>
                         <h4>Total Volume:</h4>
                         <br>
@@ -81,19 +81,18 @@
                         <h2>Personal Details</h2>
                         <hr>
                         <br>
-                        <h4>User Id:</h4>
+                        <h4>User Id: {{ data[0] }}</h4>
                         <br>
-                        <h4>User Name:</h4>
+                        <h4>User Name: {{ data[1] }}</h4>
                         <br>
-                        <h4>User E-mail:</h4>
+                        <h4>User E-mail: {{ data[2] }}</h4>
                         <br>
-                        <h4>User Mobile Number:</h4>
-                        <br>
-
                     </div>
                     <div class="modal-footer" id="footer_style">
                         <h2 style="text-align: left; padding-bottom: -15px;">Click here to edit your profile:</h2>
-                        <button class="btn btn-success" style="padding-left: -30px; padding-right: -30px;" href="profile_edit.html">Edit</button>
+                        <form action="profile_edit">
+                            <button class="btn btn-success" style="padding-left: -30px; padding-right: -30px;" type="submit" action="profile_edit">Edit</button>
+                        </form>
                     </div>
                 </div>
 
