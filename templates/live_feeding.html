@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta http-equiv="refresh" content="30">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>BI | Live Data</title>
@@ -91,7 +92,7 @@
               <thead class="thead-dark">
                 <tr>
                   <th scope="col">Trade Name</th>
-                  <th scope="col">Date/Time</th>
+                  <!-- <th scope="col">Date/Time</th> -->
                   <th scope="col">Open</th>
                   <th scope="col">High</th>
                   <th scope="col">Low</th>
@@ -100,33 +101,16 @@
                 </tr>
               </thead>
               <tbody>
+                {% for i in range(matLen) %}
                 <tr>
-                  <td>ABB</td>
-                  <td>2018-03-05 11:15:00</td>
-                  <td>143</td>
-                  <td>150</td>
-                  <td>135</td>
-                  <td>142</td>
-                  <td>1000</td>
+                  <td>{{ matrix[i][5] }}</td>
+                  <td>{{ matrix[i][0] }}</td>
+                  <td>{{ matrix[i][1] }}</td>
+                  <td>{{ matrix[i][2] }}</td>
+                  <td>{{ matrix[i][3] }}</td>
+                  <td>{{ matrix[i][4] }}</td>
                 </tr>
-                <tr>
-                  <td>ABB</td>
-                  <td>2018-03-05 11:15:00</td>
-                  <td>143</td>
-                  <td>150</td>
-                  <td>135</td>
-                  <td>142</td>
-                  <td>1000</td>
-                </tr>
-                <tr>
-                <td>ABB</td>
-                  <td>2018-03-05 11:15:00</td>
-                  <td>143</td>
-                  <td>150</td>
-                  <td>135</td>
-                  <td>142</td>
-                  <td>1000</td>
-                </tr>
+                {% endfor %}
               </tbody>
             </table>
         </div>

@@ -312,21 +312,31 @@ def print_items():
     cursor = db.execute('SELECT column1,column2,column3,column4 FROM tablename')
     return render_template('print_items.html', items=Units.query.all())
 
-@app.route("/getLiveData")
-def getLiveData():	
-	trades = ["HDFC","BIOCON","PNB","AJANTAPHARM","AKZOINDIA","ASHOKLEY","ASIANPAINT","ASTRAZEN","AUROPHARMA","AXISBANK","BAJAJCORP","BPCL","CENTRALBK","DENABANK","DISHTV","DLF","GAIL","GLENMARK","GODREJCP","GODREJIND","GPPL","HAVELLS","HDFCBANK","HEROMOTOCO","ICICIBANK","IDBI","NAUKRI","JETAIRWAYS","JUSTDIAL","ONGC"]
-	inLoop = threading.Timer(900.0,getLiveData).start()
-	for i in range(len(trades)):
-		url = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=%s&interval=15min&apikey=KPEFHIZF3S02LQF1'%(trades[i]))
-		jsonData = json.loads(url.text)
-		finalTime = getUsTime()
-		openValue = jsonData['Time Series (15min)'][finalTime]['1. open']
-		highValue = jsonData["Time Series (15min)"][finalTime]['2. high']
-		lowValue = jsonData["Time Series (15min)"][finalTime]['3. low']
-		closeValue = jsonData["Time Series (15min)"][finalTime]['4. close']
-		volumeValue = jsonData["Time Series (15min)"][finalTime]['5. volume']
-		insertLiveData(openValue, highValue, lowValue, closeValue, volumeValue, finalTime)
-	return(NULL)
+@app.route("/live_feeding")
+def live_feeding():
+	if "userEmail" in session:
+		trades = ["HDFC","BIOCON","PNB","DLF","AJANTAPHARM","AKZOINDIA","ASHOKLEY","ASIANPAINT","ASTRAZEN","AUROPHARMA","AXISBANK","BAJAJCORP","BPCL","CENTRALBK","DENABANK","DISHTV","DLF","GAIL","GLENMARK","GODREJCP","GODREJIND","GPPL","HAVELLS","HDFCBANK","HEROMOTOCO","ICICIBANK","IDBI","NAUKRI","JETAIRWAYS","JUSTDIAL","ONGC"]
+		w, h = 6, len(trades);
+		Matrix = [[0 for x in range(w)] for y in range(h)]
+		for i in range(len(trades)):
+			url = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=%s&interval=1min&apikey=KPEFHIZF3S02LQF1'%(trades[i]))
+			jsonData = json.loads(url.text)
+			if "Error Message" in jsonData:
+				Matrix[i][0] = "-"
+				Matrix[i][1] = "-"
+				Matrix[i][2] = "-"
+				Matrix[i][3] = "-"
+				Matrix[i][4] = "-"
+			else:
+				finalTime = "2018-03-14 06:00:00"
+				print(trades[i] + ": " + jsonData["Time Series (1min)"][finalTime]['1. open'])
+				Matrix[i][0] = jsonData["Time Series (1min)"][finalTime]['1. open']
+				Matrix[i][1] = jsonData["Time Series (1min)"][finalTime]['2. high']
+				Matrix[i][2] = jsonData["Time Series (1min)"][finalTime]['3. low']
+				Matrix[i][3] = jsonData["Time Series (1min)"][finalTime]['4. close']
+				Matrix[i][4] = jsonData["Time Series (1min)"][finalTime]['5. volume']
+				Matrix[i][5] = trades[i]
+		return(render_template("live_feeding.html", matrix = Matrix, matLen = len(Matrix)))	
 
 @app.route("/knn")
 def knn():
