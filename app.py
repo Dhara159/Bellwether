@@ -77,7 +77,7 @@ def insertNewUser(userName, userEmail, userPassword):
 		cursor.close()
 	return render_template("client_login.html")
 
-@app.route('/signin')
+@app.route('/signin',methods=['GET','POST'])
 def signin():
 	if "userEmail" in session:
 		return(redirect(url_for("client_page")))
@@ -278,7 +278,13 @@ def profile():
 		cursor.execute("SELECT userId,userName,userEmail,virtualMoney FROM users WHERE userEmail = '"+ userEmail +"' ")
 		data = cursor.fetchone()
 		conn.commit()
-		return render_template("profile.html",data=data)
+		userId = str(data[0])
+		print(userId)
+		cursor =conn.cursor()
+		cursor.execute("SELECT SUM(volume) from orderdetails WHERE userId= '"+ userId +"' ")
+		volume = cursor.fetchone()
+		print(volume[0])
+		return render_template("profile.html",data=data,volume=volume[0])
 	else:
 		return("You are logged out!")
 	
