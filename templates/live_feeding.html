@@ -97,18 +97,17 @@
                   <th scope="col">High</th>
                   <th scope="col">Low</th>
                   <th scope="col">Close</th>
-                  <th scope="col">Volume</th>
                 </tr>
               </thead>
               <tbody>
                 {% for i in range(matLen) %}
                 <tr>
-                  <td>{{ matrix[i][5] }}</td>
+                  
+                  <td>{{ matrix[i][4] }}</td>
                   <td>{{ matrix[i][0] }}</td>
                   <td>{{ matrix[i][1] }}</td>
                   <td>{{ matrix[i][2] }}</td>
                   <td>{{ matrix[i][3] }}</td>
-                  <td>{{ matrix[i][4] }}</td>
                 </tr>
                 {% endfor %}
               </tbody>

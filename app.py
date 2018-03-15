@@ -1,25 +1,18 @@
-from flask import Flask, request, render_template,session,make_response,url_for,redirect
+from flask import Flask, request, render_template,session,make_response,url_for,redirect, jsonify
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
-from flask import jsonify
 from pytz import timezone
-import datetime, requests
 from datetime import timedelta
-import json
-import threading
-import os, csv, quandl
-import math
-import operator
-import pandas as pd
-import io
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
 from dateutil.relativedelta import relativedelta
 from sklearn.svm import SVR
 from sklearn.neural_network import MLPRegressor
+import json, threading, os, csv, quandl, math, operator, io
+import pandas as pd
+import datetime, requests
+import matplotlib.pyplot as plt
 import numpy as np
-
 
 app = Flask(__name__)
 
@@ -27,7 +20,6 @@ app.secret_key = 'super secret key'
 
 mysql = MySQL()
  
-# MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'sql12226313'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'tmctEEKWMm'
 app.config['MYSQL_DATABASE_DB'] = 'sql12226313'
@@ -39,7 +31,6 @@ def after_request(response):
     response.headers.add('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')   
     return response
 
-
 @app.route('/')
 def hello():
 	return 'hello'
@@ -48,22 +39,13 @@ def hello():
 def signup():
 	return render_template("client_signup.html")
 	
-
 @app.route('/registered',methods = ['POST', 'GET'])
 def registered():
 	userName = request.form['userName']
 	userEmail = request.form['userEmail']
 	userPassword = request.form['userPassword']
-	#virtualMoney = 1000000
-	
-	print(userName)
-	print(userEmail)
-	print(userPassword)
 	return insertNewUser(userName, userEmail, userPassword)
 
-	#cursor.execute("select * from users")
-	#data = cursor.fetchone()
-	#return render_template("client_signin.html")
 def insertNewUser(userName, userEmail, userPassword):
 	conn = mysql.connect()
 	cursor = conn.cursor()
@@ -88,32 +70,18 @@ def signin():
 def client_dashboard():
 	userEmail = request.form['userEmail']
 	userPassword = request.form['userPassword']
-	print(userEmail)
-	print(userPassword)
 	conn = mysql.connect()
 	cursor = conn.cursor()
 	cursor.execute("SELECT userEmail,userPassword FROM users WHERE userEmail ='" + userEmail + "' ")
 	data = cursor.fetchone()
 	if data == None:
 		return render_template("client_login.html")
-	print(data)
 
 	if userEmail == data[0] and userPassword == data[1]:
 		conn.commit()
 		session['userEmail'] = userEmail
 		session['loged_in'] = True
-		# print(session)
-		#redirect(url_for('client_dashboard.html'))
-		#return gotoclient()
 		return(redirect(url_for("client_page")))
-
-	#return render_template("client_dashboard.html")
-
-#def gotoclient():
-#	if session['userEmail']==None:
-#		return('session null')
-#	else:
-#		return render_template("client_dashboard.html")
 
 @app.route('/client_page')
 def client_page():
@@ -122,7 +90,6 @@ def client_page():
 	else:
 		return("You are logged out!")
 	
-
 @app.route('/client_logout')
 def client_logout():
 	session.pop('userEmail', None)
@@ -132,13 +99,6 @@ def client_logout():
 @app.route('/logout_page')
 def logout_page():
 	return render_template("client_logout.html")
-	
-	# app.secret_key = os.urandom(32)
-	#for key in session.keys():
-	#	session.pop(key)
-	#session.clear()
-	#print(session)
-	#return signin()
 
 @app.route('/historic_data')
 def historic_data():
@@ -146,33 +106,16 @@ def historic_data():
 		return render_template("historic_data.html")
 	else:
 		return("You are logged out!")
-	
 
 @app.route('/historic_data_search')
 def historic_data_search():
 	trade = request.form['trade']
 	sdate = request.form['sdate']	
 	edate = request.form['edate']
-	print(trade)
-	print(sdate)
-	print(edate)
 	fName = str(trade + '.csv')
 	df = quandl.get("NSE/"+trade.upper(), authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=sdate,end_date=edate)
 	datalist = df.values.tolist()
-	# print(df.index)
-	# print(datalist)
-	# with open(fName,'rt') as csvfile:
-	# 	data = list(csv.reader(csvfile))
-	# 	print(data)
-	# df = pd.read_csv(fName)
-	# print(df.loc[(df['Date'] == sdate)])
-	# for x in df['Date']:
-	# 	if (x<sdate) & (x>edate):
-	# 		df1 = df(x)
-	# print(df1)
 	return render_template("historic_data_search.html",datalist=datalist, df=df.to_html(classes=["table", "thead-dark","table-bordered", "table-striped", "table-hover"]))
-
-
 
 @app.route('/algorithms')
 def algorithms():
@@ -187,7 +130,6 @@ def algorithmsrithm_prediction():
 		trade = request.form['trade']
 		return(knn("NSE/"+trade.upper() ))
 
-
 @app.route('/historic_graph')
 def historic_graph():
 	if "userEmail" in session:
@@ -195,18 +137,12 @@ def historic_graph():
 	else:
 		return("You are logged out!")
 	
-
-
 @app.route('/historic_graph_search')
 def historic_graph_search():
 	trade = request.args['trade']
 	attribute = request.args['attribute']
 	sdate = request.args['sdate']
 	edate = request.args['edate']
-	print(trade)
-	print(attribute)
-	print(sdate)
-	print(edate)
 	fName = str(trade + '.csv')
 	df = quandl.get("NSE/"+trade.upper(), authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=sdate,end_date=edate)
 	fig = df[[attribute]].plot()
@@ -214,14 +150,12 @@ def historic_graph_search():
 	data = plt.savefig(file_path)
 	return render_template("historic_graph_search.html",fig=fig)
 
-
 @app.route('/buy_sell')
 def buy_sell():
 	if "userEmail" in session:
 		return render_template("buy_sell.html")
 	else:
 		return("You are logged out!")
-
 
 @app.route('/buy_sell_confirm', methods=['GET','POST'])
 def buy_sell_confirm():
@@ -231,20 +165,12 @@ def buy_sell_confirm():
 		volume = int(request.form['volume'])
 		cprice = request.form['cprice']
 		total = request.form['total']
-		print(order_type)
-		print(trade)
-		print(volume)
-		print(cprice)
-		print(total)
-		print(type(total))
 		conn1 = mysql.connect()
 		cursor1 = conn1.cursor()
 		userEmail = str(session['userEmail'])
 		cursor1.execute("SELECT virtualMoney,userId from users WHERE userEmail ='" + userEmail + "' ")
 		virtualMoney = cursor1.fetchone()
 		userId = int(virtualMoney[1])
-		print(virtualMoney)
-		print(userId)
 		conn1.commit()
 		if(order_type == "buy"):
 			sellingPrice =0
@@ -258,7 +184,6 @@ def buy_sell_confirm():
 			virtualMoney = int(virtualMoney[0]) + int(total)
 			cursor1.execute("UPDATE users SET virtualMoney='" + str(virtualMoney) + "', userId= '"+ str(userId) +"' WHERE userEmail='"+ str(userEmail) +"' ")
 			conn1.commit()
-
 		usTime = datetime.datetime.now()
 		currenttime = usTime.strftime("%Y-%m-%d")
 		conn = mysql.connect()
@@ -279,11 +204,9 @@ def profile():
 		data = cursor.fetchone()
 		conn.commit()
 		userId = str(data[0])
-		print(userId)
 		cursor =conn.cursor()
 		cursor.execute("SELECT SUM(volume) from orderdetails WHERE userId= '"+ userId +"' ")
 		volume = cursor.fetchone()
-		print(volume[0])
 		return render_template("profile.html",data=data,volume=volume[0])
 	else:
 		return("You are logged out!")
@@ -321,7 +244,6 @@ def order_details_search():
 		return render_template("order_details.html", items=cursor.fetchall())
 	else:
 		return("You are logged out!")
-	
 
 @app.route('/print_items')
 def print_items():
@@ -331,43 +253,38 @@ def print_items():
 @app.route("/live_feeding")
 def live_feeding():
 	if "userEmail" in session:
-		trades = ["HDFC","BIOCON","PNB","DLF","AJANTAPHARM","AKZOINDIA","ASHOKLEY","ASIANPAINT","ASTRAZEN","AUROPHARMA","AXISBANK","BAJAJCORP","BPCL","CENTRALBK","DENABANK","DISHTV","DLF","GAIL","GLENMARK","GODREJCP","GODREJIND","GPPL","HAVELLS","HDFCBANK","HEROMOTOCO","ICICIBANK","IDBI","NAUKRI","JETAIRWAYS","JUSTDIAL","ONGC"]
-		w, h = 6, len(trades);
+		trades = ["HDFC","BIOCON","PNB","DLF","AJANTAPHARM","AKZOINDIA","ASHOKLEY","ASIANPAINT","ASTRAZEN","AUROPHARMA","AXISBANK","BAJAJCORP","BPCL","CENTRALBK","DENABANK","DISHTV","GAIL","GLENMARK","GODREJCP","GODREJIND","GPPL","HEROMOTOCO","IDBI","NAUKRI","JETAIRWAYS","JUSTDIAL","ONGC"]
+		w, h = 5, len(trades);
 		Matrix = [[0 for x in range(w)] for y in range(h)]
 		for i in range(len(trades)):
-			url = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=%s&interval=1min&apikey=KPEFHIZF3S02LQF1'%(trades[i]))
-			jsonData = json.loads(url.text)
-			if "Error Message" in jsonData:
-				Matrix[i][0] = "-"
-				Matrix[i][1] = "-"
-				Matrix[i][2] = "-"
-				Matrix[i][3] = "-"
-				Matrix[i][4] = "-"
-			else:
-				finalTime = "2018-03-14 06:00:00"
-				print(trades[i] + ": " + jsonData["Time Series (1min)"][finalTime]['1. open'])
-				Matrix[i][0] = jsonData["Time Series (1min)"][finalTime]['1. open']
-				Matrix[i][1] = jsonData["Time Series (1min)"][finalTime]['2. high']
-				Matrix[i][2] = jsonData["Time Series (1min)"][finalTime]['3. low']
-				Matrix[i][3] = jsonData["Time Series (1min)"][finalTime]['4. close']
-				Matrix[i][4] = jsonData["Time Series (1min)"][finalTime]['5. volume']
-				Matrix[i][5] = trades[i]
-		return(render_template("live_feeding.html", matrix = Matrix, matLen = len(Matrix)))	
+			url = 'https://www.google.co.in/search?q=nse%3A'+trades[i]+'&oq=nse%3A'+trades[i]+'&aqs=chrome..69i57j69i60j69i58.6479j0j1&sourceid=chrome&ie=UTF-8'
+			user_agent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46'
+			req = urlopen(Request(str(url), data=None, headers={'User-Agent': user_agent}))
+			soup = BeautifulSoup(req, 'html.parser')
+			currentVal = soup.find('span',attrs={'class':'W0pUAc fmob_pr fac-l'})
+			name_box = soup.find_all('td', attrs={'class':'YcIftf'})
+			openVal = name_box[0].text.strip()
+			highVal = name_box[1].text.strip()
+			lowVal = name_box[2].text.strip()
+			current = currentVal.text.strip()
+			Matrix[i][0] = openVal
+			Matrix[i][1] = highVal
+			Matrix[i][2] = lowVal
+			Matrix[i][3] = current
+			Matrix[i][4] = trades[i]
+		return(render_template("live_feeding.html", matrix = Matrix, matLen = len(Matrix)))		
 
 @app.route("/knn")
 def knn(tradeName):
     k = 3
     startDate = (datetime.datetime.now()).strftime("%Y-%m-%d")
     endDate = ((datetime.date.today()-relativedelta(months=+3))).strftime("%Y-%m-%d")
-    # tradeName = "NSE/TCS"
     df = quandl.get(tradeName, authtoken="JMRWwixg-zh5jGHGnKzn",start_date=endDate,end_date=startDate)
     df1 = df[['Open','Close']]
-    print(df1)
     dataList = df1.values.tolist()
     testInstance = dataList[len(dataList)-2]
     neighbors = getNeighbors(testInstance, dataList, k)
     idwPrediction, meanPrediction  = prediction(neighbors)
-    # return("Inverse Distance Weighted Average Prediction: %f <br/> Mean Average Prediction: %f" % (idwPrediction, meanPrediction))
     return(bb(tradeName,endDate,startDate, idwPrediction,meanPrediction))
 
 @app.route("/bb")
@@ -391,12 +308,8 @@ def bb(tradeName,endDate,startDate, idwPrediction, meanPrediction):
 	df['Market Return'] = np.log(df['Close'] / df['Close'].shift(1))
 	df['Strategy Return'] = df['Market Return'] * df['Position']
 	df = df[np.isfinite(df['Strategy Return'])]
-	print(max(df['Strategy Return']))
 	df1 = df.loc[df['Strategy Return'] == max(df['Strategy Return'])]
-	print ("minimum point for purchasing stocks %s" %df1['Close'].to_string(index=False))
-	print(min(df['Strategy Return']))
 	df2 = df.loc[df['Strategy Return'] == min(df['Strategy Return'])]
-	print ("maximum point for selling stocks %s" %df2['Close'].to_string(index=False))
 	df['Strategy Return'].cumsum().plot()
 	df[['Close','Bollinger High','Bollinger Low']].plot()
 	userEmail=session["userEmail"]
@@ -405,17 +318,11 @@ def bb(tradeName,endDate,startDate, idwPrediction, meanPrediction):
 	cursor = conn.cursor()
 	suggestedBuying = ((df1['Close'].values)[0])
 	suggestedSelling = ((df2['Close'].values)[0])
-	# print(suggestedBuying)
-	# print(suggestedSelling)
-	# print(type(suggestedBuying))
-	# print(type(suggestedSelling))
 	cursor.execute("INSERT INTO knnprediction (userEmail,trade,pdate,rdate,prediction,ssp,sbp) VALUES (%s, %s, %s, %s, %s, %s, %s)", (userEmail,  tradeName, startDate, resultDate, idwPrediction,str(suggestedSelling), str(suggestedBuying)))
 	conn.commit()
 	cursor = conn.cursor()
 	pdata = cursor.execute("SELECT * FROM knnprediction WHERE userEmail = '"+ userEmail +"' ")
 	conn.commit()
-	# return(pdata)
-	#return("idwPrediction: %s" %(idwPrediction) + "</br>" + "meanPrediction: %s" %(meanPrediction) + "</br>" + "minimum point for purchasing stocks: %s" %((df1['Close'].values))[0] + "</br>" + "maximum point for selling stocks: %s" %(df2['Close'].values)[0])
 	return render_template("algorithm_prediction.html",items=list(cursor.fetchall()))
 
 @app.route("/mlp")
@@ -544,9 +451,6 @@ def predict_prices(dates, prices, x, features):
         lms += (testResult[i] - prices[cutoff+i])**2
     avg /= le
     lms /= 2
-    print((pavg))
-    print()
-    print(avg*100, lms)
     plt.xlabel('Scaled Date')
     plt.ylabel('Closing Price')
     plt.legend()
@@ -574,8 +478,7 @@ def getNeighbors(testInstance, dataList, k):
     for x in range(k):
         neighbors.append(distances[x][0])
     return neighbors
-
-#Find euclidean distance between two instance                    
+                  
 def euclideanDistance(instance1, dataList, length, check):
     distance = 0
     for x in range(length):
@@ -585,9 +488,5 @@ def euclideanDistance(instance1, dataList, length, check):
             distance += pow((instance1[x] - dataList[check+2][x]),2)
     return math.sqrt(distance)
 
-
-
-
 if __name__ == "__main__":
-	
 	app.run()
