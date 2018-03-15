@@ -176,7 +176,17 @@ def historic_data_search():
 
 @app.route('/algorithms')
 def algorithms():
-	return render_template("algorithms.html")
+	if "userEmail" in session:
+		return render_template("algorithms.html")
+	else:
+		return("You are logged out!")
+
+@app.route('/algorithm_prediction',methods=['GET','POST'])
+def algorithmsrithm_prediction():
+	if "userEmail" in session:
+		trade = request.form['trade']
+		return(knn("NSE/"+trade.upper() ))
+
 
 @app.route('/historic_graph')
 def historic_graph():
@@ -339,12 +349,12 @@ def live_feeding():
 		return(render_template("live_feeding.html", matrix = Matrix, matLen = len(Matrix)))	
 
 @app.route("/knn")
-def knn():
+def knn(tradeName):
     k = 3
     startDate = (datetime.datetime.now()).strftime("%Y-%m-%d")
     endDate = ((datetime.date.today()-relativedelta(months=+3))).strftime("%Y-%m-%d")
-    tradeName = "NSE/TCS"
-    df = quandl.get("NSE/TCS", authtoken="JMRWwixg-zh5jGHGnKzn",start_date=endDate,end_date=startDate)
+    # tradeName = "NSE/TCS"
+    df = quandl.get(tradeName, authtoken="JMRWwixg-zh5jGHGnKzn",start_date=endDate,end_date=startDate)
     df1 = df[['Open','Close']]
     print(df1)
     dataList = df1.values.tolist()
@@ -352,10 +362,10 @@ def knn():
     neighbors = getNeighbors(testInstance, dataList, k)
     idwPrediction, meanPrediction  = prediction(neighbors)
     # return("Inverse Distance Weighted Average Prediction: %f <br/> Mean Average Prediction: %f" % (idwPrediction, meanPrediction))
-    return(bb(tradeName,endDate, idwPrediction,meanPrediction))
+    return(bb(tradeName,endDate,startDate, idwPrediction,meanPrediction))
 
 @app.route("/bb")
-def bb(tradeName,endDate, idwPrediction, meanPrediction):
+def bb(tradeName,endDate,startDate, idwPrediction, meanPrediction):
 	df = quandl.get(tradeName, authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=endDate)
 	window=20
 	no_of_std=2
@@ -383,7 +393,24 @@ def bb(tradeName,endDate, idwPrediction, meanPrediction):
 	print ("maximum point for selling stocks %s" %df2['Close'].to_string(index=False))
 	df['Strategy Return'].cumsum().plot()
 	df[['Close','Bollinger High','Bollinger Low']].plot()
-	return("idwPrediction: %s" %(idwPrediction) + "</br>" + "meanPrediction: %s" %(meanPrediction) + "</br>" + "minimum point for purchasing stocks: %s" %((df1['Close'].values))[0] + "</br>" + "maximum point for selling stocks: %s" %(df2['Close'].values)[0])
+	userEmail=session["userEmail"]
+	resultDate = datetime.date.today() + datetime.timedelta(days=1)
+	conn =mysql.connect()
+	cursor = conn.cursor()
+	suggestedBuying = ((df1['Close'].values)[0])
+	suggestedSelling = ((df2['Close'].values)[0])
+	# print(suggestedBuying)
+	# print(suggestedSelling)
+	# print(type(suggestedBuying))
+	# print(type(suggestedSelling))
+	cursor.execute("INSERT INTO knnprediction (userEmail,trade,pdate,rdate,prediction,ssp,sbp) VALUES (%s, %s, %s, %s, %s, %s, %s)", (userEmail,  tradeName, startDate, resultDate, idwPrediction,str(suggestedSelling), str(suggestedBuying)))
+	conn.commit()
+	cursor = conn.cursor()
+	pdata = cursor.execute("SELECT * FROM knnprediction WHERE userEmail = '"+ userEmail +"' ")
+	conn.commit()
+	# return(pdata)
+	#return("idwPrediction: %s" %(idwPrediction) + "</br>" + "meanPrediction: %s" %(meanPrediction) + "</br>" + "minimum point for purchasing stocks: %s" %((df1['Close'].values))[0] + "</br>" + "maximum point for selling stocks: %s" %(df2['Close'].values)[0])
+	return render_template("algorithm_prediction.html",items=list(cursor.fetchall()))
 
 @app.route("/mlp")
 def mlp():

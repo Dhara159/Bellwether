@@ -7,7 +7,7 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.5 -->
-    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="../static/custom-top-header.css">
     <script type="text/javascript" href="custom-navbar.js"></script>
   </head>
@@ -58,10 +58,50 @@
         <!--/span-->
 
             <div class="col-xs-8 col-sm-8" style="margin-top: 15px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Select anyone trade:</h2>
+                    </div>
+                    <br>
+                    <div class="modal-body">
+                    <form action="algorithm_prediction" method="POST">
+                      <div class="form-group">
+                        <label for="trade" class="bmd-label-floating">Trade Name:</label>
+                        <input type="text" class="form-control" name="trade">
+                        <span class="bmd-help">Please enter name of trade. It must be stock market compatiable and no lesser than two letters</span><br>
+                        <span class="bmd-help">And this would probably give all possible data for that particular trade. Data might be delayed by 15 minutes.</span>
+                        <br>
+                      </div>
+                      <button type="submit" name="submit" class="next action-button" value="Submit" >Submit</button>
+                    </form>    
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <h4>Click to check prediction values.</h4>
+                        
+                    </div>
+                </div>
                 
-                <div class="row" style="margin-left: 10px;">
-                    
-                    
+                <!-- <div class="row" style="margin-left: 10px;"> -->
+         <!--           <div class="model-content">
+                        <div class="model-header"><h2>Select Trade for prediction</h2></div>
+                        <div class="model-body">
+                            <form action="algorithm_prediction" method="POST">
+                               <div class="form-group">
+                                <label for="trade" class="bmd-label-floating">Trade Name:</label>
+                                <input type="text" class="form-control" name="trade">
+                                <span class="bmd-help">Please enter name of trade. It must be stock market compatiable and no lesser than two letters</span><br>
+                                <span class="bmd-help">And this would probably give all possible data for that particular trade. Data might be delayed by 15 minutes.</span>
+                                <br>
+                              </div>
+                              <button type="submit" name="submit" class="next action-button" value="Submit" >Submit</button>
+                            </form> 
+                        </div>
+                        <div class="model-footer">
+                            <h2>Click to check prediction values.</h2>
+                        </div>
+                    </div>
+                
                             <div class="jumbotron" style="background-color:#1e88e5 ; color: #ffffff;">
                                 <div class="panel-header"><h2>Kth Nearest Neighbor:</h2></div>
                                 <div class="panel-body"><h3>The training examples are vectors in a multidimensional feature space, each with a class label. The training phase of the algorithm consists only of storing the feature vectors and class labels of the training samples.</h3></div>
@@ -91,8 +131,8 @@
                                 </div>
                             </div>
                     
-
-                    </div>
+ -->
+                    <!-- </div> -->
                 </div>
             </div>
             <!--/span-->
