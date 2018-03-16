@@ -8,6 +8,8 @@ from matplotlib.figure import Figure
 from dateutil.relativedelta import relativedelta
 from sklearn.svm import SVR
 from sklearn.neural_network import MLPRegressor
+from urllib.request import urlopen, Request
+from bs4 import BeautifulSoup
 import json, threading, os, csv, quandl, math, operator, io
 import pandas as pd
 import datetime, requests
