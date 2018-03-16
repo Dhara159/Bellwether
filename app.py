@@ -28,6 +28,37 @@ app.config['MYSQL_DATABASE_DB'] = 'sql12226313'
 app.config['MYSQL_DATABASE_HOST'] = 'sql12.freemysqlhosting.net'
 mysql.init_app(app)
 
+def preLoad():
+	usTime = datetime.datetime.now()
+	# currenttime = usTime.strftime("%H:%M:%S")
+	today9am = usTime.replace(hour=9, minute=30, second=0, microsecond=0)
+	if usTime > today9am:
+		todayDate = usTime.date()
+		conn = mysql.connect()
+		cursor = conn.cursor()
+		cursor.execute("SELECT * FROM dpdata WHERE rdate >='" + str(todayDate) + "' ")
+		checkData = cursor.fetchall()
+		checkData = list(checkData)
+		conn.commit()
+		cursor.execute("DELETE FROM dpdata WHERE pdate <'" + str(todayDate) + "' ")
+		conn.commit()
+		for x in range(len(checkData)):
+			singleList = list(checkData[x])
+			userId = singleList[0]
+			buyPrice = cursor.execute("SELECT purchasePrice from orderdetails WHERE userId ='" + str(userId) + "' ")
+			url = 'https://www.google.co.in/search?q=nse%3A'+ singleList[2] +'&oq=nse%3A'+ singleList[2] +'&aqs=chrome..69i57j69i60j69i58.6479j0j1&sourceid=chrome&ie=UTF-8'
+			user_agent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46'
+			req = urlopen(Request(str(url), data=None, headers={'User-Agent': user_agent}))
+			soup = BeautifulSoup(req, 'html.parser')
+			currentVal = soup.find('span',attrs={'class':'W0pUAc fmob_pr fac-l'})
+			current = float((currentVal.text.strip()).replace(',', ''))
+			if abs(current-singleList[6]) < 20:
+				print("Time to sell")
+			elif abs(current-singleList[7]) < 20:
+				print("Time to buy")
+	conn.close()
+	app.run()
+
 @app.after_request
 def after_request(response):
     response.headers.add('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')   
@@ -506,4 +537,4 @@ def euclideanDistance(instance1, dataList, length, check):
     return math.sqrt(distance)
 
 if __name__ == "__main__":
-	app.run()
+	preLoad()
