@@ -220,20 +220,17 @@ def profile_edit():
 	else:
 		return("You are logged out!")
 
-@app.route("/order_details")
+@app.route("/order_details",methods=['POST','GET'])
 def order_details():
 	if "userEmail" in session:
 		conn = mysql.connect()
 		cursor = conn.cursor()
+
 		cursor.execute('SELECT id,userId,tradeName,dates,purchasePrice,sellingPrice,volume FROM orderdetails')
 		conn.commit()
-		return redirect(url_for("order_details_return"))
+		return render_template("order_details.html", items=cursor.fetchall())
 	else:
 		return("You are logged out!")
-
-@app.route("/order_details_return")
-def order_details_return():
-	return render_template("order_details.html", items=cursor.fetchall())
 
 @app.route("/order_details_search",methods=['POST','GET'])	
 def order_details_search():
