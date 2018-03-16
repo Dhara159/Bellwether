@@ -355,16 +355,32 @@ def mlp():
 
 @app.route("/svrlinear")
 def svrlinear():
+    # dates = []
+    # prices = []
+    # with open('AAPL_last_month.csv','r') as csvfile:
+    #     csvFileReader = csv.reader(csvfile)
+    #     next(csvFileReader)
+    #     for row in csvFileReader:
+    #         dates.append(int(row[0].split('-')[0]))
+    #         prices.append(float(row[4]))
+    # predictedPrice=predictPricesSvrlinear(dates,prices, 167)
+    # return("SVRLinear predicted price: %f" % (predictedPrice))
     dates = []
-    prices = []
-    with open('AAPL_last_month.csv','r') as csvfile:
-        csvFileReader = csv.reader(csvfile)
-        next(csvFileReader)
-        for row in csvFileReader:
-            dates.append(int(row[0].split('-')[0]))
-            prices.append(float(row[4]))
-    predictedPrice=predictPricesSvrlinear(dates,prices, 167)
-    return("SVRLinear predicted price: %f" % (predictedPrice))
+    cprices = []
+    oprices = []
+    startDate = (datetime.datetime.now()).strftime("%Y-%m-%d")
+    endDate = ((datetime.date.today()-relativedelta(days=+10))).strftime("%Y-%m-%d")
+    print(startDate)
+    print(endDate)
+    df = quandl.get('NSE/PNB', authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=endDate,end_date=startDate)
+    print(df)
+    cprices = df['Close']
+    oprices = df['Open']
+    print(cprices)
+    print(oprices)
+    print(dates)
+    predictedPrice = predictPricesSvrlinear(cprices,oprices, 99)
+    return(str(predictedPrice))
 
 @app.route("/svrpoly")
 def svrpoly():
@@ -412,17 +428,19 @@ def predictPricesSvrpoly(dates,prices,x):
     plt.show()
     return svr_poly.predict(x)[0]
 
-def predictPricesSvrlinear(dates,prices,x):
-    dates = np.reshape(dates,(len(dates),1))
-    svr_lin=SVR(kernel='linear', C=1)
-    svr_lin.fit(dates,prices)
-    plt.scatter(dates,prices, color='black', label='Data')
-    plt.plot(dates,svr_lin.predict(dates),color='red',label='Linear Model')
-    plt.xlabel('Date')
-    plt.ylabel('Price')
-    plt.legend()
-    plt.show()
-    return svr_lin.predict(x)[0]
+def predictPricesSvrlinear(cprices,oprices,x):
+	cprices= np.reshape(cprices,(len(cprices),1))
+	#dates = dates.values.reshape(8,1)
+	svr_lin=SVR(kernel='linear', C=1)
+	#svr_poly=SVR(kernel='poly', C=0.02, degree=2)
+	svr_lin.fit(cprices,oprices)
+	plt.scatter(cprices,oprices, color='black', label='Data')
+	plt.plot(cprices,svr_lin.predict(cprices),color='red',label='Linear Model')
+	plt.xlabel('Close Prices')
+	plt.ylabel('Open prices')
+	plt.legend()
+	plt.show()
+	return(svr_lin.predict(x)[0])
 
 def to_integer(dt_time):
     return 10000 * int(dt_time[2]) + 100 * int(dt_time[1]) + int(dt_time[0])    
