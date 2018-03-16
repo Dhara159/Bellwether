@@ -133,14 +133,14 @@ def client_logout():
 def logout_page():
 	return render_template("client_logout.html")
 
-@app.route('/historic_data')
+@app.route('/historic_data',methods=['GET','POST'])
 def historic_data():
 	if "userEmail" in session:
 		return render_template("historic_data.html")
 	else:
 		return("You are logged out!")
 
-@app.route('/historic_data_search')
+@app.route('/historic_data_search',methods=['GET','POST'])
 def historic_data_search():
 	trade = request.form['trade']
 	sdate = request.form['sdate']	
@@ -163,14 +163,14 @@ def algorithmsrithm_prediction():
 		trade = request.form['trade']
 		return(knn("NSE/"+trade.upper() ))
 
-@app.route('/historic_graph')
+@app.route('/historic_graph',methods=['GET','POST'])
 def historic_graph():
 	if "userEmail" in session:
 		return render_template("historic_graph.html")
 	else:
 		return("You are logged out!")
 	
-@app.route('/historic_graph_search')
+@app.route('/historic_graph_search',methods=['GET','POST'])
 def historic_graph_search():
 	trade = request.args['trade']
 	attribute = request.args['attribute']
