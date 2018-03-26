@@ -22,10 +22,10 @@ app.secret_key = 'super secret key'
 
 mysql = MySQL()
  
-app.config['MYSQL_DATABASE_USER'] = 'sql12226313'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'tmctEEKWMm'
-app.config['MYSQL_DATABASE_DB'] = 'sql12226313'
-app.config['MYSQL_DATABASE_HOST'] = 'sql12.freemysqlhosting.net'
+app.config['MYSQL_DATABASE_USER'] = 'root'
+app.config['MYSQL_DATABASE_PASSWORD'] = ''
+app.config['MYSQL_DATABASE_DB'] = 'bi1'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
 def preLoad():
@@ -146,7 +146,7 @@ def historic_data_search():
 	sdate = request.form['sdate']	
 	edate = request.form['edate']
 	fName = str(trade + '.csv')
-	df = quandl.get("NSE/"+trade.upper(), authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=sdate,end_date=edate)
+	df = quandl.get("NSE/"+trade.upper(), authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=edate,end_date=sdate)
 	datalist = df.values.tolist()
 	return render_template("historic_data_search.html",datalist=datalist, df=df.to_html(classes=["table", "thead-dark","table-bordered", "table-striped", "table-hover"]))
 
