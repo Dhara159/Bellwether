@@ -146,7 +146,7 @@ def historic_data_search():
 	sdate = request.form['sdate']	
 	edate = request.form['edate']
 	fName = str(trade + '.csv')
-	df = quandl.get("NSE/"+trade.upper(), authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=edate,end_date=sdate)
+	df = quandl.get("NSE/"+trade.upper(), authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=sdate,end_date=edate)
 	datalist = df.values.tolist()
 	return render_template("historic_data_search.html",datalist=datalist, df=df.to_html(classes=["table", "thead-dark","table-bordered", "table-striped", "table-hover"]))
 
@@ -172,16 +172,16 @@ def historic_graph():
 	
 @app.route('/historic_graph_search',methods=['GET','POST'])
 def historic_graph_search():
-	trade = request.args['trade']
-	attribute = request.args['attribute']
-	sdate = request.args['sdate']
-	edate = request.args['edate']
+	trade = request.form['trade']
+	attribute = request.form['attribute']
+	sdate = request.form['sdate']
+	edate = request.form['edate']
 	fName = str(trade + '.csv')
 	df = quandl.get("NSE/"+trade.upper(), authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=sdate,end_date=edate)
 	fig = df[[attribute]].plot()
-	file_path = "static/images/mytable1.png"
+	file_path = "static/images/mytable.png"
 	data = plt.savefig(file_path)
-	return render_template("historic_graph_search.html",fig=fig)
+	return render_template("historic_graph_search.html",df=df,data=data)
 
 @app.route('/buy_sell')
 def buy_sell():
