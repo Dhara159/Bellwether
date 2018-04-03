@@ -22,10 +22,10 @@ app.secret_key = 'super secret key'
 
 mysql = MySQL()
  
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = ''
-app.config['MYSQL_DATABASE_DB'] = 'bi1'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['MYSQL_DATABASE_USER'] = 'id5196376_admin'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'qazwsxedc@1598753'
+app.config['MYSQL_DATABASE_DB'] = 'id5196376_bellwether'
+app.config['MYSQL_DATABASE_HOST'] = 'databases.000webhost.com'
 mysql.init_app(app)
 
 def preLoad():
