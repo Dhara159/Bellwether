@@ -293,15 +293,18 @@ def live_feeding():
 			soup = BeautifulSoup(req, 'html.parser')
 			currentVal = soup.find('span',attrs={'class':'W0pUAc fmob_pr fac-l'})
 			name_box = soup.find_all('td', attrs={'class':'YcIftf'})
-			openVal = name_box[0].text.strip()
-			highVal = name_box[1].text.strip()
-			lowVal = name_box[2].text.strip()
-			current = currentVal.text.strip()
-			Matrix[i][0] = openVal
-			Matrix[i][1] = highVal
-			Matrix[i][2] = lowVal
-			Matrix[i][3] = current
-			Matrix[i][4] = trades[i]
+			if len(name_box) == 0:
+				Matrix[i][4] = trades[i]
+			else:
+				openVal = name_box[0].text.strip()
+				highVal = name_box[1].text.strip()
+				lowVal = name_box[2].text.strip()
+				current = currentVal.text.strip()
+				Matrix[i][0] = openVal
+				Matrix[i][1] = highVal
+				Matrix[i][2] = lowVal
+				Matrix[i][3] = current
+				Matrix[i][4] = trades[i]
 		return(render_template("live_feeding.html", matrix = Matrix, matLen = len(Matrix)))		
 
 @app.route("/knn")
