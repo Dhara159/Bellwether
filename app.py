@@ -428,6 +428,17 @@ def svrpoly():
     predictedPrice=predictPricesSvrpoly(dates,prices, 167)
     return("SVRPolynomial predicted price: %f" % (predictedPrice))
 
+@app.route("/getCurrentPrice",methods=['POST'])	
+def getCurrentPrice():
+	tradeName = (request.form["tradeName"]).upper()
+	url = 'https://www.google.co.in/search?q=nse%3A'+tradeName+'&oq=nse%3A'+tradeName+'&aqs=chrome..69i57j69i60j69i58.6479j0j1&sourceid=chrome&ie=UTF-8'
+	user_agent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46'
+	req = urlopen(Request(str(url), data=None, headers={'User-Agent': user_agent}))
+	soup = BeautifulSoup(req, 'html.parser')
+	currentVal = soup.find('span',attrs={'class':'W0pUAc fmob_pr fac-l'})
+	current = float((currentVal.text.strip()).replace(',', ''))
+	return json.dumps(float(current))
+
 def insertLiveData(openValue, highValue, lowValue, closeValue, volumeValue, finalTime):
 	conn = mysql.connect()
 	cursor = conn.cursor()
