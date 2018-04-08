@@ -129,7 +129,7 @@
     function updatePrice()
     {
         var volume = parseInt($("#volume").val())
-        var currentPrice = parseInt($("#currentPrice").val())
+        var currentPrice = parseFloat($("#currentPrice").val())
         var total = volume * currentPrice
         $("#total").val(total)
     }
