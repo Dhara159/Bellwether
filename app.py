@@ -56,7 +56,7 @@ def preLoad():
 				print("Time to sell")
 			elif abs(current-singleList[7]) < 20:
 				print("Time to buy")
-	conn.close()
+		conn.close()
 	app.run()
 
 @app.after_request
