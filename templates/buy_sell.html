@@ -85,11 +85,11 @@
                                 <br>
 
                                 <label for="volume" class="bmd-label-floating">Number of shares:</label>
-                                <input type="text" class="form-control" name="volume">
+                                <input type="text" class="form-control" name="volume" id="volume" onkeyup="updatePrice()">
                                 <br>
 
                                 <label for="total" class="bmd-label-floating">Total Price:</label>
-                                <input type="text" class="form-control" name="total">
+                                <input type="text" class="form-control" name="total" id="total" readonly>
                             </div>
                             <button type="submit" name="submit" class="next action-button" value="Submit" >Submit</button>
                         </form>    
@@ -124,6 +124,14 @@
                 console.log(error);
             }
         })
+    }
+
+    function updatePrice()
+    {
+        var volume = parseInt($("#volume").val())
+        var currentPrice = parseInt($("#currentPrice").val())
+        var total = volume * currentPrice
+        $("#total").val(total)
     }
 </script>
 </html>
