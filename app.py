@@ -186,7 +186,22 @@ def historic_graph_search():
 @app.route('/buy_sell')
 def buy_sell():
 	if "userEmail" in session:
-		return render_template("buy_sell.html")
+		trades = ["HDFC","BIOCON","PNB","DLF","AKZOINDIA","ASHOKLEY","ASIANPAINT","ASTRAZEN","AUROPHARMA","AXISBANK","BAJAJCORP","BPCL","CENTRALBK","DENABANK","DISHTV","GAIL","GLENMARK","GODREJCP","GODREJIND","GPPL","HEROMOTOCO","IDBI","NAUKRI","JETAIRWAYS","JUSTDIAL","ONGC"]
+		mat = {}
+		for trade in trades:
+			todayTime = datetime.datetime.now()
+			yesterday = todayTime - timedelta(1)
+			latest = yesterday.strftime("%Y-%m-%d")
+			old = ((datetime.date.today()-relativedelta(months=+3))).strftime("%Y-%m-%d")
+			df = quandl.get("NSE/"+trade.upper(), authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=old, end_date=latest)
+			datalist = df.values.tolist()	
+			oldData = datalist[0][4]
+			latestData = datalist[len(datalist)-1][4]
+			finalResult = oldData-latestData
+			if finalResult > 0:
+				mat[trade] = finalResult
+		maxValTrade = max(mat.items(), key=operator.itemgetter(1))[0]
+		return render_template("buy_sell.html",tradeToBuy=maxValTrade)
 	else:
 		return("You are logged out!")
 
@@ -283,7 +298,7 @@ def print_items():
 @app.route("/live_feeding")
 def live_feeding():
 	if "userEmail" in session:
-		trades = ["HDFC","BIOCON","PNB","DLF","AJANTAPHARM","AKZOINDIA","ASHOKLEY","ASIANPAINT","ASTRAZEN","AUROPHARMA","AXISBANK","BAJAJCORP","BPCL","CENTRALBK","DENABANK","DISHTV","GAIL","GLENMARK","GODREJCP","GODREJIND","GPPL","HEROMOTOCO","IDBI","NAUKRI","JETAIRWAYS","JUSTDIAL","ONGC"]
+		trades = ["HDFC","BIOCON","PNB","DLF","AKZOINDIA","ASHOKLEY","ASIANPAINT","ASTRAZEN","AUROPHARMA","AXISBANK","BAJAJCORP","BPCL","CENTRALBK","DENABANK","DISHTV","GAIL","GLENMARK","GODREJCP","GODREJIND","GPPL","HEROMOTOCO","IDBI","NAUKRI","JETAIRWAYS","JUSTDIAL","ONGC"]
 		w, h = 5, len(trades);
 		Matrix = [[0 for x in range(w)] for y in range(h)]
 		for i in range(len(trades)):
@@ -438,6 +453,28 @@ def getCurrentPrice():
 	currentVal = soup.find('span',attrs={'class':'W0pUAc fmob_pr fac-l'})
 	current = float((currentVal.text.strip()).replace(',', ''))
 	return json.dumps(float(current))
+
+# @app.route("/getbest")
+# def getbest():
+# 	trades = ["HDFC","BIOCON","PNB","DLF","AKZOINDIA","ASHOKLEY","ASIANPAINT","ASTRAZEN","AUROPHARMA","AXISBANK","BAJAJCORP","BPCL","CENTRALBK","DENABANK","DISHTV","GAIL","GLENMARK","GODREJCP","GODREJIND","GPPL","HEROMOTOCO","IDBI","NAUKRI","JETAIRWAYS","JUSTDIAL","ONGC"]
+# 	mat = {}
+# 	for trade in trades:
+# 		todayTime = datetime.datetime.now()
+# 		yesterday = todayTime - timedelta(1)
+# 		latest = yesterday.strftime("%Y-%m-%d")
+# 		old = ((datetime.date.today()-relativedelta(months=+3))).strftime("%Y-%m-%d")
+# 		df = quandl.get("NSE/"+trade.upper(), authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=old, end_date=latest)
+# 		datalist = df.values.tolist()	
+# 		oldData = datalist[0][4]
+# 		latestData = datalist[len(datalist)-1][4]
+# 		finalResult = oldData-latestData
+# 		if finalResult > 0:
+# 			mat[trade] = finalResult
+# 	print(mat)
+# 	maxValTrade = max(mat.items(), key=operator.itemgetter(1))[0]
+# 	return("trades")
+
+
 
 def insertLiveData(openValue, highValue, lowValue, closeValue, volumeValue, finalTime):
 	conn = mysql.connect()
