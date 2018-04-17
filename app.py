@@ -208,7 +208,6 @@ def buy_sell():
 @app.route('/buy_sell_confirm', methods=['GET','POST'])
 def buy_sell_confirm():
 	if "userEmail" in session:
-		order_type=request.form['buy']
 		trade = request.form['trade']
 		volume = int(request.form['volume'])
 		cprice = request.form['cprice']
@@ -220,18 +219,62 @@ def buy_sell_confirm():
 		virtualMoney = cursor1.fetchone()
 		userId = int(virtualMoney[1])
 		conn1.commit()
-		if(order_type == "buy"):
-			sellingPrice =0
-			purchasePrice = total
-			virtualMoney = int(virtualMoney[0]) - int(total)
-			cursor1.execute("UPDATE users SET virtualMoney='" + str(virtualMoney) + "', userId= '"+ str(userId) +"' WHERE userEmail='"+ str(userEmail) +"' ")
-			conn1.commit()
-		else:
-			purchasePrice =0
-			sellingPrice = total
-			virtualMoney = int(virtualMoney[0]) + int(total)
-			cursor1.execute("UPDATE users SET virtualMoney='" + str(virtualMoney) + "', userId= '"+ str(userId) +"' WHERE userEmail='"+ str(userEmail) +"' ")
-			conn1.commit()
+		purchasePrice = total
+		virtualMoney = int(virtualMoney[0]) - int(total)
+		cursor1.execute("UPDATE users SET virtualMoney='" + str(virtualMoney) + "', userId= '"+ str(userId) +"' WHERE userEmail='"+ str(userEmail) +"' ")
+		conn1.commit()
+		usTime = datetime.datetime.now()
+		currenttime = usTime.strftime("%Y-%m-%d")
+		conn = mysql.connect()
+		cursor = conn.cursor()
+		cursor.execute("INSERT INTO orderdetails (userId,tradeName,dates,purchasePrice,sellingPrice,volume) VALUES (%s,%s,%s,%s,%s,%s)", (str(userId),trade,str(currenttime),float(purchasePrice),float(sellingPrice),float(volume)))
+		conn.commit()
+		return render_template("buy_sell_confirm.html", trade=trade,volume=volume,total=total,cprice=cprice,purchasePrice=purchasePrice,sellingPrice=sellingPrice)
+	else:
+		return("You are logged out!")
+
+
+@app.route('/sell_buy')
+def sell_buy():
+	if "userEmail" in session:
+		trades = ["HDFC","BIOCON","PNB","DLF","AKZOINDIA","ASHOKLEY","ASIANPAINT","ASTRAZEN","AUROPHARMA","AXISBANK","BAJAJCORP","BPCL","CENTRALBK","DENABANK","DISHTV","GAIL","GLENMARK","GODREJCP","GODREJIND","GPPL","HEROMOTOCO","IDBI","NAUKRI","JETAIRWAYS","JUSTDIAL","ONGC"]
+		mat = {}
+		for trade in trades:
+			todayTime = datetime.datetime.now()
+			yesterday = todayTime - timedelta(1)
+			latest = yesterday.strftime("%Y-%m-%d")
+			old = ((datetime.date.today()-relativedelta(months=+3))).strftime("%Y-%m-%d")
+			df = quandl.get("NSE/"+trade.upper(), authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=old, end_date=latest)
+			datalist = df.values.tolist()	
+			oldData = datalist[0][4]
+			latestData = datalist[len(datalist)-1][4]
+			finalResult = oldData-latestData
+			if finalResult > 0:
+				mat[trade] = finalResult
+		maxValTrade = max(mat.items(), key=operator.itemgetter(1))[0]
+		return render_template("sell_buy.html",tradeToBuy=maxValTrade)
+	else:
+		return("You are logged out!")
+
+@app.route('/sell_buy_confirm', methods=['GET','POST'])
+def sell_buy_confirm():
+	if "userEmail" in session:
+		trade = request.form['trade']
+		volume = int(request.form['volume'])
+		cprice = request.form['cprice']
+		total = request.form['total']
+		conn1 = mysql.connect()
+		cursor1 = conn1.cursor()
+		userEmail = str(session['userEmail'])
+		cursor1.execute("SELECT virtualMoney,userId from users WHERE userEmail ='" + userEmail + "' ")
+		virtualMoney = cursor1.fetchone()
+		userId = int(virtualMoney[1])
+		conn1.commit()
+		purchasePrice =0
+		sellingPrice = total
+		virtualMoney = int(virtualMoney[0]) + int(total)
+		cursor1.execute("UPDATE users SET virtualMoney='" + str(virtualMoney) + "', userId= '"+ str(userId) +"' WHERE userEmail='"+ str(userEmail) +"' ")
+		conn1.commit()
 		usTime = datetime.datetime.now()
 		currenttime = usTime.strftime("%Y-%m-%d")
 		conn = mysql.connect()
