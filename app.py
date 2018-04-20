@@ -236,25 +236,45 @@ def buy_sell_confirm():
 
 @app.route('/sell_buy')
 def sell_buy():
-	if "userEmail" in session:
-		trades = ["HDFC","BIOCON","PNB","DLF","AKZOINDIA","ASHOKLEY","ASIANPAINT","ASTRAZEN","AUROPHARMA","AXISBANK","BAJAJCORP","BPCL","CENTRALBK","DENABANK","DISHTV","GAIL","GLENMARK","GODREJCP","GODREJIND","GPPL","HEROMOTOCO","IDBI","NAUKRI","JETAIRWAYS","JUSTDIAL","ONGC"]
-		mat = {}
-		for trade in trades:
-			todayTime = datetime.datetime.now()
-			yesterday = todayTime - timedelta(1)
-			latest = yesterday.strftime("%Y-%m-%d")
-			old = ((datetime.date.today()-relativedelta(months=+3))).strftime("%Y-%m-%d")
-			df = quandl.get("NSE/"+trade.upper(), authtoken="5GGEggAyyGa6_mVsKrxZ",start_date=old, end_date=latest)
-			datalist = df.values.tolist()	
-			oldData = datalist[0][4]
-			latestData = datalist[len(datalist)-1][4]
-			finalResult = oldData-latestData
-			if finalResult > 0:
-				mat[trade] = finalResult
-		maxValTrade = max(mat.items(), key=operator.itemgetter(1))[0]
-		return render_template("sell_buy.html",tradeToBuy=maxValTrade)
-	else:
-		return("You are logged out!")
+	userEmail = str(session["userEmail"])
+	conn = mysql.connect()
+	cursor = conn.cursor()
+	cursor.execute("SELECT userId FROM users WHERE userEmail ='" + userEmail +"' ")
+	userId = cursor.fetchone()
+	cursor.execute("SELECT tradeName FROM orderdetails WHERE userId = '" + str(userId[0]) + "'")
+	tradeName = list(cursor.fetchone())
+	sellMatrix = []
+	for trade in tradeName:
+		tradeData = []
+		tradeData.append(trade)
+		cursor.execute("SELECT purchasePrice FROM orderdetails WHERE tradeName = '" +trade+ "'")
+		price = list(cursor.fetchone())
+		purchasePrice = np.mean(price)
+		tradeData.append(purchasePrice)
+		url = 'https://www.google.co.in/search?q=nse%3A'+trade+'&oq=nse%3A'+trade+'&aqs=chrome..69i57j69i60j69i58.6479j0j1&sourceid=chrome&ie=UTF-8'
+		user_agent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46'
+		req = urlopen(Request(str(url), data=None, headers={'User-Agent': user_agent}))
+		soup = BeautifulSoup(req, 'html.parser')
+		currentVal = soup.find('span',attrs={'class':'IsqQVc'})
+		currentSell = float((currentVal.text.strip()).replace(',', ''))
+		tradeData.append(currentSell)
+		sellMatrix.append(tradeData)
+	sellList = []
+	for everyTrade in sellMatrix:
+		tradeList = []
+		tName = everyTrade[0]
+		buyPrice = everyTrade[1]
+		sellPrice = everyTrade[2]
+		if sellPrice > buyPrice:
+			priceDiff = sellPrice - buyPrice
+			tradeList.append(tName)
+			tradeList.append(priceDiff)
+			sellList.append(tradeList)
+		else:
+			sellTrade = ['-', 0]
+			return render_template("sell.html", trade=sellTrade[0],sellPrice=sellTrade[1])
+	sellTrade = (max((a,b) for (a,b) in sellList))
+	return render_template("sell.html", trade=sellTrade[0],sellPrice=sellTrade[1])
 
 @app.route('/sell_buy_confirm', methods=['GET','POST'])
 def sell_buy_confirm():

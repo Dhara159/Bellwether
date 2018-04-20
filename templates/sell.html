@@ -67,18 +67,18 @@
                 <form action="#">
                   <div class="form-group">
                     <label for="trade" class="bmd-label-floating">Trade Name:</label>
-                    <input type="text" class="form-control" name="trade">
+                    <input type="text" class="form-control" name="trade" value="{{ trade }}" id="tradeToSell" readonly>
                     <span class="bmd-help">Please enter name of trade. It must be stock market compatiable and no lesser than two letters</span><br>
                     <span class="bmd-help">And this would probably give all possible data for that particular trade. Data might be delayed by 15 minutes.</span>
                     <br>
                     <label for="cprice" class="bmd-label-floating">Current price per share:</label>
-                    <input type="text" class="form-control" name="cprice">
+                    <input type="text" class="form-control" name="cprice" value="{{ sellPrice }}" id="sellPrice" readonly>
                     <br>
                     <label for="volume" class="bmd-label-floating">Number of shares:</label>
-                    <input type="text" class="form-control" name="volume">
+                    <input type="text" class="form-control" name="volume" onkeyup="updatePrice(this)">
                     <br>
                     <label for="total" class="bmd-label-floating">Total Price:</label>
-                    <input type="text" class="form-control" name="total">
+                    <input type="text" class="form-control" name="total" id="total" readonly>
                   </div>
                   <button type="submit" name="submit" class="next action-button" value="Submit" >Submit</button>
                 </form>    
@@ -97,4 +97,14 @@
 </div>
 <!--/.container-->
   </body>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    function updatePrice(e) 
+    {
+        initVal = $("#sellPrice").val();
+        totalSell = e.value * initVal;
+        $("#total").val(totalSell);
+
+    }
+  </script>
 </html>
