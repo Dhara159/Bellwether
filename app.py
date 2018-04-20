@@ -50,7 +50,7 @@ def preLoad():
 			user_agent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46'
 			req = urlopen(Request(str(url), data=None, headers={'User-Agent': user_agent}))
 			soup = BeautifulSoup(req, 'html.parser')
-			currentVal = soup.find('span',attrs={'class':'W0pUAc fmob_pr fac-l'})
+			currentVal = soup.find('span',attrs={'class':'IsqQVc'})
 			current = float((currentVal.text.strip()).replace(',', ''))
 			if abs(current-singleList[6]) < 20:
 				print("Time to sell")
@@ -369,8 +369,8 @@ def live_feeding():
 			user_agent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46'
 			req = urlopen(Request(str(url), data=None, headers={'User-Agent': user_agent}))
 			soup = BeautifulSoup(req, 'html.parser')
-			currentVal = soup.find('span',attrs={'class':'W0pUAc fmob_pr fac-l'})
-			name_box = soup.find_all('td', attrs={'class':'YcIftf'})
+			currentVal = soup.find('span',attrs={'class':'IsqQVc'})
+			name_box = soup.find_all('td', attrs={'class':'iyjjgb'})
 			if len(name_box) == 0:
 				Matrix[i][4] = trades[i]
 			else:
@@ -513,7 +513,7 @@ def getCurrentPrice():
 	user_agent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46'
 	req = urlopen(Request(str(url), data=None, headers={'User-Agent': user_agent}))
 	soup = BeautifulSoup(req, 'html.parser')
-	currentVal = soup.find('span',attrs={'class':'W0pUAc fmob_pr fac-l'})
+	currentVal = soup.find('span',attrs={'class':'IsqQVc'})
 	current = float((currentVal.text.strip()).replace(',', ''))
 	return json.dumps(float(current))
 
