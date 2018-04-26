@@ -220,6 +220,9 @@ def buy_sell_confirm():
 		userId = int(virtualMoney[1])
 		conn1.commit()
 		purchasePrice = total
+		sellingPrice = 0
+		print(virtualMoney[0])
+		print(virtualMoney[1])
 		virtualMoney = int(virtualMoney[0]) - int(total)
 		cursor1.execute("UPDATE users SET virtualMoney='" + str(virtualMoney) + "', userId= '"+ str(userId) +"' WHERE userEmail='"+ str(userEmail) +"' ")
 		conn1.commit()
