@@ -181,7 +181,7 @@ def historic_graph_search():
 	fig = df[[attribute]].plot()
 	file_path = "static/images/mytable.png"
 	data = plt.savefig(file_path)
-	return render_template("historic_graph_search.html",df=df,data=data)
+	return render_template("historic_graph_search.html",df=df,data=data,file_path=file_path)
 
 @app.route('/buy_sell')
 def buy_sell():
