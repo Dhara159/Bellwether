@@ -186,7 +186,7 @@ def historic_graph_search():
 @app.route('/buy_sell')
 def buy_sell():
 	if "userEmail" in session:
-		trades = ["HDFC","BIOCON","PNB","DLF","AKZOINDIA","ASHOKLEY","ASIANPAINT","ASTRAZEN","AUROPHARMA","AXISBANK","BAJAJCORP","BPCL","CENTRALBK","DENABANK","DISHTV","GAIL","GLENMARK","GODREJCP","GODREJIND","GPPL","HEROMOTOCO","IDBI","NAUKRI","JETAIRWAYS","JUSTDIAL","ONGC"]
+		trades = ["HDFC","BIOCON","PNB","DLF","AKZOINDIA","ASHOKLEY","ASIANPAINT","ASTRAZEN","AUROPHARMA","AXISBANK","BAJAJCORP","BPCL","CENTRALBK","DENABANK","DISHTV","GAIL","GLENMARK","GODREJCP","GODREJIND","GPPL","HEROMOTOCO","IDBI","JETAIRWAYS","JUSTDIAL","ONGC"]
 		mat = {}
 		for trade in trades:
 			todayTime = datetime.datetime.now()
@@ -201,6 +201,8 @@ def buy_sell():
 			if finalResult > 0:
 				mat[trade] = finalResult
 		maxValTrade = max(mat.items(), key=operator.itemgetter(1))[0]
+		trade ="NSE/"+(maxValTrade.upper())
+		knn(trade)
 		return render_template("buy_sell.html",tradeToBuy=maxValTrade)
 	else:
 		return("You are logged out!")
@@ -221,9 +223,7 @@ def buy_sell_confirm():
 		conn1.commit()
 		purchasePrice = total
 		sellingPrice = 0
-		print(type(virtualMoney[0]))
-		print(virtualMoney[1])
-		virtualMoney = int(virtualMoney[0]) - int(total)
+		virtualMoney = int(virtualMoney[0]) - int(float(total))
 		cursor1.execute("UPDATE users SET virtualMoney='" + str(virtualMoney) + "', userId= '"+ str(userId) +"' WHERE userEmail='"+ str(userEmail) +"' ")
 		conn1.commit()
 		usTime = datetime.datetime.now()
