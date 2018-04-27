@@ -245,16 +245,16 @@ def sell_buy():
 	cursor.execute("SELECT userId FROM users WHERE userEmail ='" + userEmail +"' ")
 	userId = cursor.fetchone()
 	cursor.execute("SELECT tradeName FROM orderdetails WHERE userId = '" + str(userId[0]) + "'")
-	tradeName = list(cursor.fetchone())
+	tradeName = list(cursor.fetchall())
 	sellMatrix = []
 	for trade in tradeName:
 		tradeData = []
-		tradeData.append(trade)
-		cursor.execute("SELECT purchasePrice FROM orderdetails WHERE tradeName = '" +trade+ "'")
+		tradeData.append(trade[0])
+		cursor.execute("SELECT purchasePrice FROM orderdetails WHERE tradeName = '" +trade[0]+ "'")
 		price = list(cursor.fetchone())
 		purchasePrice = np.mean(price)
 		tradeData.append(purchasePrice)
-		url = 'https://www.google.co.in/search?q=nse%3A'+trade+'&oq=nse%3A'+trade+'&aqs=chrome..69i57j69i60j69i58.6479j0j1&sourceid=chrome&ie=UTF-8'
+		url = 'https://www.google.co.in/search?q=nse%3A'+trade[0]+'&oq=nse%3A'+trade[0]+'&aqs=chrome..69i57j69i60j69i58.6479j0j1&sourceid=chrome&ie=UTF-8'
 		user_agent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46'
 		req = urlopen(Request(str(url), data=None, headers={'User-Agent': user_agent}))
 		soup = BeautifulSoup(req, 'html.parser')
@@ -268,14 +268,16 @@ def sell_buy():
 		tName = everyTrade[0]
 		buyPrice = everyTrade[1]
 		sellPrice = everyTrade[2]
-		if sellPrice > buyPrice:
+		userEmail = str(session['userEmail'])
+		cursor.execute("SELECT ssp from knnprediction WHERE userEmail = '"+ userEmail +"' AND trade = 'NSE/"+ tName+"' ORDER BY ssp ASC ")
+		ssp = cursor.fetchone()
+		if sellPrice > buyPrice and sellPrice >= ssp[0]:
 			priceDiff = sellPrice - buyPrice
 			tradeList.append(tName)
 			tradeList.append(priceDiff)
 			sellList.append(tradeList)
 		else:
 			sellTrade = ['-', 0]
-			return render_template("sell.html", trade=sellTrade[0],sellPrice=sellTrade[1])
 	sellTrade = (max((a,b) for (a,b) in sellList))
 	return render_template("sell.html", trade=sellTrade[0],sellPrice=sellTrade[1])
 
@@ -358,7 +360,7 @@ def order_details_search():
 
 @app.route('/print_items')
 def print_items():
-    cursor = db.execute('SELECT column1,column2,column3,column4 FROM tablename')
+    cursor = db.execute('SELECT column1,column2,column3,column4 FROM tfablename')
     return render_template('print_items.html', items=Units.query.all())
 
 @app.route("/live_feeding")
