@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>BI | Sell</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.5 -->
+    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/custom-top-header.css">
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+    <div class="navbar navbar-fixed-top navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#"><img src="../static/images/final-logo-without-text.png" width="55px" height="55px" style="margin-top: -15px;"></a><h4 style="margin-top: 10px; color: #208dbf">Bellwether Investments</h4>
+            </div>
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav" id="right-sided">
+                    <li style="margin-top:15px;">hello {{session['userEmail']}}</li>
+                    <li><a href="index">Home</a></li>
+                    <li><a href="about">About</a></li>
+                    <li><a href="contact">Contact</a></li>
+                    <li><a href="client_logout">Logout</a></li>
+                </ul>
+            </div>
+            <!-- /.nav-collapse -->
+        </div>
+        <!-- /.container -->
+    </div>
+    <!-- /.navbar -->
+
+    <div class="container-fluid">
+        <div class="row row-offcanvas row-offcanvas-left">
+            <div class="col-xs-4 col-sm-2 sidebar-offcanvas navbar-custom" id="sidebar" role="navigation">
+                <div class="sidebar-nav">
+                    <ul class="nav">
+                        <li><a href="client_page">Dashboard</a></li>
+                        <li><a href="live_feeding">Live Feeding</a></li>
+                        <li class="active"><a href="historic_data">Historic Datas</a></li>
+                        <li><a href="historic_graph">Historic Graphs</a></li>
+                        <li class="nav-divider"></li>
+                        <li><a href="algorithms">Prediction Algorithms</a></li>
+                        <li class="nav-divider"></li>
+                        <li><a href="order_details">Order Details</a></li>
+                        <li><a href="buy_sell">Buy</a></li>
+                        <li><a href="sell_buy">Sell</a></li>
+                        <li><a href="profile">Profile</a></li>
+                    </ul>
+                </div>
+                <!--/.well -->
+            </div>
+            <!--/span-->
+
+            <div class="col-xs-8 col-sm-8" style="margin-top: 15px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Sell your Shares here</h2>
+                    </div>
+                    <br>
+                    <div class="modal-body">
+                        <form action="buy_sell_confirm" method="POST">
+                            <div class="form-group">
+                                <!-- <label for="trade" class="bmd-label-floating">Select any one option:</label>
+                                <div class="radio-inline">
+                                    <label><input type="radio" name="buy" value="buy">Buy</label>
+                                </div>
+                                <div class="radio-inline">
+                                    <label><input type="radio" name="buy" value="sell">Sell</label>
+                                </div> -->
+                                <br>
+                                <br>
+                                <label for="trade" class="bmd-label-floating">Trade Name:</label>
+                                <input type="text" class="form-control" name="trade" id="trade" value="{{ tradeToBuy }}">
+                                <span class="bmd-help">Please enter name of trade. It must be stock market compatiable and no lesser than two letters</span><br>
+                                <span class="bmd-help">And this would probably give all possible data for that particular trade. Data might be delayed by 15 minutes.</span>
+                                <br>
+
+                                <label for="cprice" class="bmd-label-floating">Current price per share:</label>
+                                <input type="text" class="form-control" id="currentPrice" name="cprice" readonly>
+                                <br>
+
+                                <label for="volume" class="bmd-label-floating">Number of shares:</label>
+                                <input type="text" class="form-control" name="volume" id="volume" onkeyup="updatePrice()">
+                                <br>
+
+                                <label for="total" class="bmd-label-floating">Total Price:</label>
+                                <input type="text" class="form-control" name="total" id="total" readonly>
+                            </div>
+                            <button type="submit" name="submit" class="next action-button" value="Submit" >Submit</button>
+                        </form>    
+                    </div>
+                    <div class="modal-footer">
+                        <h4>Once you click button, you will be asked for confirmation on your purchase/sell according to availability of virtual money.</h4>
+                    </div>
+                </div>
+            </div>
+        <!--/span-->
+        </div>
+    <!--/row-->
+    </div>
+<!--/.container-->
+</body>
+<script type="text/javascript" href="../static/bootstrap/js/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function()
+    {
+        var tradeName = $("#trade").val();
+        $.ajax({
+            url: "getCurrentPrice",
+            type: "post",
+            data: {"tradeName": tradeName},
+            success: function(data)
+            {
+                console.log(data)
+                $("#currentPrice").val(data);
+            },
+            error: function(error)
+            {
+                console.log(error);
+            }
+        })
+    });
+
+    function updatePrice()
+    {
+        var volume = parseInt($("#volume").val())
+        var currentPrice = parseFloat($("#currentPrice").val())
+        var total = volume * currentPrice
+        $("#total").val(total)
+    }
+</script>
+</html>
