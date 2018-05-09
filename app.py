@@ -319,11 +319,12 @@ def profile():
 		cursor.execute("SELECT userId,userName,userEmail,virtualMoney FROM users WHERE userEmail = '"+ userEmail +"' ")
 		data = cursor.fetchone()
 		conn.commit()
+		money_spend=1000000 - data[3]
 		userId = str(data[0])
 		cursor =conn.cursor()
 		cursor.execute("SELECT SUM(volume) from orderdetails WHERE userId= '"+ userId +"' ")
 		volume = cursor.fetchone()
-		return render_template("profile.html",data=data,volume=volume[0])
+		return render_template("profile.html",data=data,volume=volume[0], money_spend=money_spend)
 	else:
 		return("You are logged out!")
 	
