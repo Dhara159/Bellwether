@@ -370,7 +370,7 @@ def print_items():
     cursor = db.execute('SELECT column1,column2,column3,column4 FROM tfablename')
     return render_template('print_items.html', items=Units.query.all())
 
-@app.route("/live_feeding")
+@app.route("/live_feeding", methods=['GET', 'POST'])
 def live_feeding():
 	if "userEmail" in session:
 		trades = ["HDFC","BIOCON","PNB","DLF","AKZOINDIA","ASHOKLEY","ASIANPAINT","ASTRAZEN","AUROPHARMA","AXISBANK","BAJAJCORP","BPCL","CENTRALBK","DENABANK","DISHTV","GAIL","GLENMARK","GODREJCP","GODREJIND","GPPL","HEROMOTOCO","IDBI","NAUKRI","JETAIRWAYS","JUSTDIAL","ONGC"]
@@ -396,6 +396,34 @@ def live_feeding():
 				Matrix[i][3] = current
 				Matrix[i][4] = trades[i]
 		return(render_template("live_feeding.html", matrix = Matrix, matLen = len(Matrix)))		
+
+@app.route("/live_feeding_search", methods=['GET', 'POST'])
+def live_feeding_search():
+	if "userEmail" in session:
+		trades = request.form["trade"]
+		print(trades)
+		w = 5
+		Matrix = [0 for x in range(w)] 
+		for i in trades:
+			url = 'https://www.google.co.in/search?q=nse%3A'+trades+'&oq=nse%3A'+trades+'&aqs=chrome..69i57j69i60j69i58.6479j0j1&sourceid=chrome&ie=UTF-8'
+			user_agent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46'
+			req = urlopen(Request(str(url), data=None, headers={'User-Agent': user_agent}))
+			soup = BeautifulSoup(req, 'html.parser')
+			currentVal = soup.find('span',attrs={'class':'IsqQVc'})
+			name_box = soup.find_all('td', attrs={'class':'iyjjgb'})
+			if len(name_box) == 0:
+				Matrix[i][4] = trades[i]
+			else:
+				openVal = name_box[0].text.strip()
+				highVal = name_box[1].text.strip()
+				lowVal = name_box[2].text.strip()
+				current = currentVal.text.strip()
+				Matrix[0] = openVal
+				Matrix[1] = highVal
+				Matrix[2] = lowVal
+				Matrix[3] = current
+				Matrix[4] = trades[0]
+		return(render_template("live_feeding.html", matrix = Matrix, matLen = len(Matrix)))	
 
 @app.route("/knn")
 def knn(tradeName):
