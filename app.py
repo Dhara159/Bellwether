@@ -338,10 +338,13 @@ def profile_edit():
 @app.route("/order_details",methods=['POST','GET'])
 def order_details():
 	if "userEmail" in session:
+		userEmail=str(session['userEmail'])
 		conn = mysql.connect()
 		cursor = conn.cursor()
-
-		cursor.execute('SELECT id,userId,tradeName,dates,purchasePrice,sellingPrice,volume FROM orderdetails')
+		cursor.execute(" SELECT userId from users WHERE userEmail ='" + userEmail + "' ")
+		userId = cursor.fetchone()
+		print(userId)
+		cursor.execute("SELECT id,userId,tradeName,dates,purchasePrice,sellingPrice,volume FROM orderdetails WHERE userId = '"+ str(userId[0]) +"' ")
 		conn.commit()
 		return render_template("order_details.html", items=cursor.fetchall())
 	else:
@@ -350,10 +353,13 @@ def order_details():
 @app.route("/order_details_search",methods=['POST','GET'])	
 def order_details_search():
 	if "userEmail" in session:
+		userEmail = str(session["userEmail"])
+		trade = request.form['trade']
 		conn = mysql.connect()
 		cursor = conn.cursor()
-		trade = request.form['trade']
-		cursor.execute("SELECT id,userId,tradeName,dates,purchasePrice,sellingPrice,volume FROM orderdetails WHERE tradeName ='" + trade + "' ")
+		cursor.execute("SELECT userId FROM users WHERE userEmail ='" + userEmail +"' ")
+		userId = cursor.fetchone()
+		cursor.execute("SELECT id,userId,tradeName,dates,purchasePrice,sellingPrice,volume FROM orderdetails WHERE tradeName ='" + trade + "' AND userId = '" + str(userId[0]) + "'")
 		conn.commit()
 		return render_template("order_details.html", items=cursor.fetchall())
 	else:
