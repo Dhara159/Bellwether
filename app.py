@@ -276,9 +276,9 @@ def sell_buy():
 			tradeList.append(tName)
 			tradeList.append(priceDiff)
 			sellList.append(tradeList)
+			sellTrade = (max((a,b) for (a,b) in sellList))
 		else:
 			sellTrade = ['-', 0]
-	sellTrade = (max((a,b) for (a,b) in sellList))
 	return render_template("sell.html", trade=sellTrade[0],sellPrice=sellTrade[1])
 
 @app.route('/sell_buy_confirm', methods=['GET','POST'])
