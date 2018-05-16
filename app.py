@@ -161,7 +161,7 @@ def algorithms():
 def algorithmsrithm_prediction():
 	if "userEmail" in session:
 		trade = request.form['trade']
-		return(knn("NSE/"+trade.upper() ))
+		return(knn("NSE/"+trade.upper()))
 
 @app.route('/historic_graph',methods=['GET','POST'])
 def historic_graph():
@@ -202,7 +202,6 @@ def buy_sell():
 				mat[trade] = finalResult
 		maxValTrade = max(mat.items(), key=operator.itemgetter(1))[0]
 		trade ="NSE/"+(maxValTrade.upper())
-		knn(trade)
 		return render_template("buy_sell.html",tradeToBuy=maxValTrade)
 	else:
 		return("You are logged out!")
@@ -214,6 +213,8 @@ def buy_sell_confirm():
 		volume = int(request.form['volume'])
 		cprice = request.form['cprice']
 		total = request.form['total']
+		predictedPrice = knn("NSE/"+trade.upper())
+		# print(predictedPrice)
 		conn1 = mysql.connect()
 		cursor1 = conn1.cursor()
 		userEmail = str(session['userEmail'])
@@ -231,6 +232,7 @@ def buy_sell_confirm():
 		conn = mysql.connect()
 		cursor = conn.cursor()
 		cursor.execute("INSERT INTO orderdetails (userId,tradeName,dates,purchasePrice,sellingPrice,volume) VALUES (%s,%s,%s,%s,%s,%s)", (str(userId),trade,str(currenttime),float(purchasePrice),float(sellingPrice),float(volume)))
+		cursor.execute("INSERT INTO profit (userEmail,trade,prediction,ssp,sbp,purchasePrice,sellingPrice) VALUES (%s,%s,%s,%s,%s,%s,%s)", (userEmail,trade,str(predictedPrice[0]),float(predictedPrice[1]),float(predictedPrice[2]),float(purchasePrice),float(sellingPrice)))
 		conn.commit()
 		return render_template("buy_sell_confirm.html", trade=trade,volume=volume,total=total,cprice=cprice,purchasePrice=purchasePrice,sellingPrice=sellingPrice)
 	else:
@@ -288,6 +290,7 @@ def sell_buy_confirm():
 		volume = int(request.form['volume'])
 		cprice = request.form['cprice']
 		total = request.form['total']
+		predictedPrice = knn("NSE/"+trade.upper())
 		conn1 = mysql.connect()
 		cursor1 = conn1.cursor()
 		userEmail = str(session['userEmail'])
@@ -305,6 +308,7 @@ def sell_buy_confirm():
 		conn = mysql.connect()
 		cursor = conn.cursor()
 		cursor.execute("INSERT INTO orderdetails (userId,tradeName,dates,purchasePrice,sellingPrice,volume) VALUES (%s,%s,%s,%s,%s,%s)", (str(userId),trade,str(currenttime),float(purchasePrice),float(sellingPrice),float(volume)))
+		cursor.execute("INSERT INTO profit (userEmail,trade,prediction,ssp,sbp,purchasePrice,sellingPrice) VALUES (%s,%s,%s,%s,%s,%s,%s)", (userEmail,trade,str(predictedPrice[0]),float(predictedPrice[1]),float(predictedPrice[2]),float(purchasePrice),float(sellingPrice)))
 		conn.commit()
 		return render_template("buy_sell_confirm.html", trade=trade,volume=volume,total=total,cprice=cprice,purchasePrice=purchasePrice,sellingPrice=sellingPrice)
 	else:
@@ -474,7 +478,9 @@ def bb(tradeName,endDate,startDate, idwPrediction, meanPrediction):
 	cursor = conn.cursor()
 	pdata = cursor.execute("SELECT * FROM knnprediction WHERE userEmail = '"+ userEmail +"' ")
 	conn.commit()
-	return render_template("algorithm_prediction.html",items=list(cursor.fetchall()))
+	result = [idwPrediction,str(suggestedSelling), str(suggestedBuying)]
+	return result
+	# return render_template("algorithm_prediction.html",items=list(cursor.fetchall()))
 
 @app.route("/mlp")
 def mlp():
