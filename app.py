@@ -163,6 +163,32 @@ def algorithmsrithm_prediction():
 		trade = request.form['trade']
 		return(knn("NSE/"+trade.upper()))
 
+@app.route('/profit',methods=['GET','POST'])
+def profit():
+	if "userEmail" in session:
+		conn = mysql.connect()
+		cursor = conn.cursor()
+		userEmail = str(session['userEmail'])
+		cursor.execute("SELECT prediction,ssp,sbp from profit WHERE userEmail ='" + userEmail + "' ")
+		data = list(cursor.fetchall())
+		df = pd.DataFrame(data)
+		print(df)
+		fig = df[[0,1,2]].plot()
+		file_path = "static/images/graph1.png"
+		data = plt.savefig(file_path)
+		conn1 = mysql.connect()
+		cursor1 = conn1.cursor()
+		cursor1.execute("SELECT prediction,purchasePrice,sellingPrice from profit WHERE userEmail ='" + userEmail + "' ")
+		data1 = list(cursor1.fetchall())
+		df1 = pd.DataFrame(data1)
+		print(df1)
+		fig1 = df1.plot.scatter(x=0, y=1,c=2)
+		file_path1 = "static/images/graph2.png"
+		data1 = plt.savefig(file_path1)
+		return render_template("profit.html", data = data,df=df,file_path=file_path, data1 = data1,df1=df1,file_path1=file_path1)
+	else:
+		return("You are logged out!")
+
 @app.route('/historic_graph',methods=['GET','POST'])
 def historic_graph():
 	if "userEmail" in session:
