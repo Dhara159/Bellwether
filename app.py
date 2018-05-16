@@ -246,8 +246,11 @@ def sell_buy():
 	userId = cursor.fetchone()
 	cursor.execute("SELECT tradeName FROM orderdetails WHERE userId = '" + str(userId[0]) + "'")
 	tradeName = list(cursor.fetchall())
+	print(tradeName)
 	sellMatrix = []
 	for trade in tradeName:
+		print(trade)
+		print(trade[0])
 		tradeData = []
 		tradeData.append(trade[0])
 		cursor.execute("SELECT purchasePrice FROM orderdetails WHERE tradeName = '" +trade[0]+ "'")
@@ -259,6 +262,7 @@ def sell_buy():
 		req = urlopen(Request(str(url), data=None, headers={'User-Agent': user_agent}))
 		soup = BeautifulSoup(req, 'html.parser')
 		currentVal = soup.find('span',attrs={'class':'IsqQVc'})
+		print(currentVal)
 		currentSell = float((currentVal.text.strip()).replace(',', ''))
 		tradeData.append(currentSell)
 		sellMatrix.append(tradeData)
