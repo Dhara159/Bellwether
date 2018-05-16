@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>BI | Historic Graph</title>
+    <title>BI | Historic Data</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.5 -->
@@ -44,7 +44,7 @@
                 <ul class="nav">
                     <li><a href="client_page">Dashboard</a></li>
                     <li><a href="live_feeding">Live Feeding</a></li>
-                    <li class="active"><a href="historic_data">Historic Datas</a></li>
+                    <li><a href="historic_data">Historic Datas</a></li>
                     <li><a href="historic_graph">Historic Graphs</a></li>
                     <li class="nav-divider"></li>
                     <li><a href="algorithms">Prediction Algorithms</a></li>
@@ -52,7 +52,7 @@
                     <li><a href="order_details">Order Details</a></li>
                     <li><a href="buy_sell">Buy</a></li>
                     <li><a href="sell_buy">Sell</a></li>
-                    <li><a href="profit">Profit</a></li>
+                    <li class="active"><a href="profit">Profit</a></li>
                     <li><a href="profile">Profile</a></li>
                 </ul>
             </div>
@@ -61,37 +61,12 @@
         <!--/span-->
 
             <div class="col-xs-8 col-sm-8" style="margin-top: 15px;">
-                <div class="modal-content">
-                <div class="modal-header">
-                    Historic Data 
-                </div>
-                <br>
-                <div class="modal-body">
-                <form action="historic_graph_search" method="POST">
-                  <div class="form-group">
-                    <label for="trade" class="bmd-label-floating">Trade Name:</label>
-                    <input type="text" class="form-control" name="trade">
-                    <span class="bmd-help">Please enter name of trade. It must be stock market compatiable and no lesser than two letters</span><br>
-                    <span class="bmd-help">And this would probably give all possible data for that particular trade. Data might be delayed by 15 minutes.</span>
-                    <br>
-                    <label for="attribute" class="bmd-label-floating">Attribute:</label>
-                    <input type="text" class="form-control" name="attribute">
-                    <br>                    
-                    <label for="sdate" class="bmd-label-floating">Start Date:</label>
-                    <input type="date" class="form-control" name="sdate">
-                    <br>
-                    <label for="edate" class="bmd-label-floating">End Date:</label>
-                    <input type="date" class="form-control" name="edate">
-                  </div>
-                  <button type="submit" name="submit" class="next action-button" value="Search" >Search</button>
-                </form>    
-                </div>
-                
-                <div class="modal-footer">
-                    <h4>Table will show you all details of trade which you selected.</h4>
-                    
-                </div>
-                </div>
+                <h1>Profit graph using your invested data and our prediction:</h1>
+                <img src="{{ url_for('static', filename='images/graph1.png') }}">
+            </div>
+            <div class="col-xs-8 col-sm-8" style="margin-top: 15px;">
+                <h1>Profit graph of your purchased/sold:</h1>
+                <img src="{{ url_for('static', filename='images/graph2.png') }}">
             </div>
             <!--/span-->
         </div>
@@ -101,3 +76,4 @@
 <!--/.container-->
   </body>
 </html>
+
