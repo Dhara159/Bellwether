@@ -16,7 +16,7 @@ click==6.7
 cloudpickle==0.5.2
 compizconfig-python==0.9.13.1
 configparser==3.5.0
-cryptography==2.1.4
+cryptography==3.2
 cycler==0.10.0
 DateTime==4.2
 decorator==4.0.11
