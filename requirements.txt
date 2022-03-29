@@ -68,7 +68,7 @@ packaging==16.8
 pandas==0.22.0
 pandas-datareader==0.3.0.post0
 pandocfilters==1.4.2
-paramiko==2.0.0
+paramiko==2.10.1
 parso==0.1.1
 pathlib2==2.3.0
 pbr==2.0.0
