@@ -52,7 +52,7 @@ MarkupSafe==1.0
 matplotlib==2.0.0
 mccabe==0.6.1
 mercurial==4.3.1
-mistune==0.8.3
+mistune==2.0.3
 mock==2.0.0
 more-itertools==4.1.0
 mysql-connector-python==2.1.6
